@@ -1,0 +1,76 @@
+package com.fanduel.depthchart.domain;
+
+import com.fanduel.depthchart.exception.DepthChartValidationException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static com.fanduel.depthchart.fixture.PlayerFixture.BLAINE_GABBERT;
+import static com.fanduel.depthchart.fixture.PlayerFixture.KYLE_TRASK;
+import static com.fanduel.depthchart.fixture.PlayerFixture.TOM_BRADY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class DepthChartAddTest {
+    private DepthChart depthChart;
+    private Position qb;
+
+    @BeforeEach
+    void setUp() {
+        depthChart = new DepthChart();
+        qb = Position.of("QB");
+    }
+
+    @Test
+    void addPlayer_shouldAppendWhenDepthIsNull() {
+        depthChart.addPlayer(qb, TOM_BRADY, null);
+
+        assertEquals(List.of(TOM_BRADY), depthChart.snapshot().get(qb));
+    }
+
+    @Test
+    void addPlayer_shouldInsertAtRequestedDepthAndShiftPlayersDown() {
+        depthChart.addPlayer(qb, TOM_BRADY, 0);
+        depthChart.addPlayer(qb, KYLE_TRASK, 1);
+
+        depthChart.addPlayer(qb, BLAINE_GABBERT, 1);
+
+        assertEquals(
+                List.of(TOM_BRADY, BLAINE_GABBERT, KYLE_TRASK),
+                depthChart.snapshot().get(qb));
+    }
+
+    @Test
+    void addPlayer_shouldAllowDepthEqualToCurrentSize() {
+        depthChart.addPlayer(qb, TOM_BRADY, 0);
+
+        depthChart.addPlayer(qb, BLAINE_GABBERT, 1);
+
+        assertEquals(List.of(TOM_BRADY, BLAINE_GABBERT), depthChart.snapshot().get(qb));
+    }
+
+    @Test
+    void addPlayer_shouldRejectNegativeDepth() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> depthChart.addPlayer(qb, TOM_BRADY, -1));
+    }
+
+    @Test
+    void addPlayer_shouldRejectDepthGreaterThanCurrentSize() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> depthChart.addPlayer(qb, TOM_BRADY, 1));
+    }
+
+    @Test
+    void addPlayer_shouldRepositionExistingPlayerAtSamePosition() {
+        depthChart.addPlayer(qb, TOM_BRADY, 0);
+        depthChart.addPlayer(qb, BLAINE_GABBERT, 1);
+
+        depthChart.addPlayer(qb, TOM_BRADY, 1);
+
+        assertEquals(List.of(BLAINE_GABBERT, TOM_BRADY), depthChart.snapshot().get(qb));
+    }
+}

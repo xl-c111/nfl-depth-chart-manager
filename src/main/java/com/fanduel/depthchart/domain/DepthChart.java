@@ -53,6 +53,10 @@ public class DepthChart {
     }
 
     public Map<Position, List<Player>> snapshot() {
-        return Collections.unmodifiableMap(new LinkedHashMap<>());
+        Map<Position, List<Player>> snapshot = new LinkedHashMap<>();
+        for (Map.Entry<Position, List<Player>> entry : chart.entrySet()) {
+            snapshot.put(entry.getKey(), List.copyOf(entry.getValue()));
+        }
+        return Collections.unmodifiableMap(snapshot);
     }
 }
