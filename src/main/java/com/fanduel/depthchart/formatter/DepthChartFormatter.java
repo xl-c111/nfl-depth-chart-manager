@@ -1,4 +1,4 @@
-package com.fanduel.depthchart.io;
+package com.fanduel.depthchart.formatter;
 
 import com.fanduel.depthchart.domain.Player;
 import com.fanduel.depthchart.domain.Position;

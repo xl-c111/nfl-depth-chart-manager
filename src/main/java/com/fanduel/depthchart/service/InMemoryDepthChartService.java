@@ -3,7 +3,7 @@ package com.fanduel.depthchart.service;
 import com.fanduel.depthchart.domain.DepthChart;
 import com.fanduel.depthchart.domain.Player;
 import com.fanduel.depthchart.domain.Position;
-import com.fanduel.depthchart.io.DepthChartFormatter;
+import com.fanduel.depthchart.formatter.DepthChartFormatter;
 import java.util.List;
 
 /** In-memory service for NFL depth chart use cases. */
