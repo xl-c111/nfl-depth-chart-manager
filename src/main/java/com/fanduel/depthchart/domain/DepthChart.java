@@ -1,19 +1,47 @@
 package com.fanduel.depthchart.domain;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
+import com.fanduel.depthchart.exception.DepthChartValidationException;
 
 /**
  * Aggregate root for depth chart rules.
  *
- * Implementation intentionally deferred while project skeleton is being finalized.
+ * Implementation intentionally deferred while project skeleton is being
+ * finalized.
  */
 public class DepthChart {
+    private final Map<Position, List<Player>> chart = new LinkedHashMap<>();
 
     public void addPlayer(Position position, Player player, Integer depth) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Objects.requireNonNull(position, "position must not be null");
+        Objects.requireNonNull(player, "player must not be null");
+
+        List<Player> playerAtPosition = chart.get(position);
+        if (playerAtPosition == null) {
+            playerAtPosition = new ArrayList<>();
+            chart.put(position, playerAtPosition);
+        }
+
+        // treat re-add as reposition
+        playerAtPosition.remove(player);
+
+        if (depth == null) {
+            playerAtPosition.add(player);
+            return;
+        }
+        if (depth < 0 || depth > playerAtPosition.size()) {
+            throw new DepthChartValidationException(
+                    "depth must be between 0 and current size for position " + position);
+        }
+
+        playerAtPosition.add(depth, player);
+
     }
 
     public List<Player> removePlayer(Position position, Player player) {
