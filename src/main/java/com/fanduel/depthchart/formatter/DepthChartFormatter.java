@@ -6,9 +6,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 
-/** Responsible only for converting a depth chart snapshot into display text. */
+/**
+ * Formatter for converting depth chart snapshots into display text.
+ *
+ * @author Xiaoling Cui
+ * @version 1.0
+ */
 public class DepthChartFormatter {
 
+    /**
+     * Formats a depth chart snapshot into multi-line text.
+     *
+     * @param snapshot the depth chart snapshot
+     * @return the formatted depth chart string
+     */
     public String format(Map<Position, List<Player>> snapshot) {
         StringJoiner lines = new StringJoiner(System.lineSeparator());
         for (Map.Entry<Position, List<Player>> entry : snapshot.entrySet()) {

@@ -13,7 +13,7 @@ Java 17 + Maven implementation of the FanDuel Trading Solutions take-home challe
   - Core domain model and rules (`Player`, `Position`, `DepthChart`, `DepthChartEntry`)
 - `src/main/java/com/fanduel/depthchart/service`
   - Use-case API and orchestration (`DepthChartService`, `InMemoryDepthChartService`)
-- `src/main/java/com/fanduel/depthchart/io`
+- `src/main/java/com/fanduel/depthchart/formatter`
   - Output formatting (`DepthChartFormatter`)
 - `src/main/java/com/fanduel/depthchart/exception`
   - Business validation exception (`DepthChartValidationException`)

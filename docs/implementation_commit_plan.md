@@ -14,7 +14,7 @@ Deliver the FanDuel NFL Depth Chart solution with production-style commit hygien
 The repository currently contains architecture skeleton only:
 - `domain`: core model and unimplemented aggregate methods
 - `service`: API contract and in-memory orchestration
-- `io`: formatter
+- `formatter`: display formatting
 - `exception`: validation exception type
 
 ## Planned Commit Sequence
@@ -89,12 +89,12 @@ The repository currently contains architecture skeleton only:
 ### 9. Implement full chart snapshot + formatting
 - Scope:
   - `src/main/java/com/fanduel/depthchart/domain/DepthChart.java`
-  - `src/main/java/com/fanduel/depthchart/io/DepthChartFormatter.java`
+  - `src/main/java/com/fanduel/depthchart/formatter/DepthChartFormatter.java`
   - `src/main/java/com/fanduel/depthchart/service/InMemoryDepthChartService.java`
 - Outcome:
   - Immutable chart snapshot and deterministic formatted output.
 - Message:
-  - `feat(io): implement full depth chart snapshot and formatter`
+  - `feat(formatter): implement full depth chart snapshot and formatter`
 
 ### 10. Add service-level contract tests
 - Scope:
@@ -106,7 +106,7 @@ The repository currently contains architecture skeleton only:
 
 ### 11. Refactor and documentation pass
 - Scope:
-  - public classes under `domain/service/io/exception`
+  - public classes under `domain/service/formatter/exception`
 - Outcome:
   - Javadoc for public contracts/invariants, naming and method-size cleanup.
 - Message:
