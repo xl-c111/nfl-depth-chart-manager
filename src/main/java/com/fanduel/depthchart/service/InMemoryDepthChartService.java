@@ -53,7 +53,7 @@ public class InMemoryDepthChartService implements DepthChartService {
      *
      * @param position position code
      * @param player player to remove
-     * @return a single-element list when removed, or empty list when absent
+     * @return a single-element list {@code [player]} when removed, or an empty list {@code []} when not listed at that position
      */
     @Override
     public List<Player> removePlayerFromDepthChart(String position, Player player) {

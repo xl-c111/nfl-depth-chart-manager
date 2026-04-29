@@ -25,7 +25,7 @@ public interface DepthChartService {
      *
      * @param position the position code
      * @param player   the player to remove
-     * @return the updated player list at that position
+     * @return a single-element list {@code [player]} when removed, or an empty list {@code []} when not listed at that position
      */
     List<Player> removePlayerFromDepthChart(String position, Player player);
 

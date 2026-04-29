@@ -135,6 +135,20 @@ class InMemoryDepthChartServiceTest {
     }
 
     @Test
+    void getFullDepthChart_shouldBeStableAcrossRepeatedReads() {
+        addSampleDepthChart();
+
+        String first = service.getFullDepthChart();
+        List<Player> ignored = service.getBackups("QB", TOM_BRADY);
+        String second = service.getFullDepthChart();
+        String third = service.getFullDepthChart();
+
+        assertEquals(List.of(BLAINE_GABBERT, KYLE_TRASK), ignored);
+        assertEquals(first, second);
+        assertEquals(second, third);
+    }
+
+    @Test
     void addPlayerToDepthChart_shouldNormalizePositionInput() {
         service.addPlayerToDepthChart(" qb ", TOM_BRADY, 0);
 
