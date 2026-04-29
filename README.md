@@ -10,7 +10,7 @@ Java 17 + Maven implementation of the FanDuel Trading Solutions take-home challe
 
 ## Project Structure
 - `src/main/java/com/fanduel/depthchart/domain`
-  - Core domain model and rules (`Player`, `Position`, `DepthChart`, `DepthChartEntry`)
+  - Core domain model and rules (`Player`, `Position`, `DepthChart`)
 - `src/main/java/com/fanduel/depthchart/service`
   - Use-case API and orchestration (`DepthChartService`, `InMemoryDepthChartService`)
 - `src/main/java/com/fanduel/depthchart/formatter`
