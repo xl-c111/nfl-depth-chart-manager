@@ -6,14 +6,25 @@ import java.util.List;
 
 /**
  * Demo scenario runner for the take-home sample flow.
+ *
+ * @author Xiaoling Cui
+ * @version 1.0
  */
 public class DemoScenario {
     private final DepthChartService service;
 
+    /**
+     * Constructs a demo scenario runner.
+     *
+     * @param service depth chart service used by the demo flow
+     */
     public DemoScenario(DepthChartService service) {
         this.service = service;
     }
 
+    /**
+     * Runs the full sample scenario from the challenge prompt.
+     */
     public void run() {
         Player tomBrady = new Player(12, "Tom Brady");
         Player blaineGabbert = new Player(11, "Blaine Gabbert");
@@ -66,12 +77,25 @@ public class DemoScenario {
         service.addPlayerToDepthChart("LWR", scottMiller, 2);
     }
 
+    /**
+     * Prints backups for a player at a position.
+     *
+     * @param playerName display name for output
+     * @param position position code
+     * @param player player to query
+     */
     private void printBackups(String playerName, String position, Player player) {
         System.out.println();
         System.out.println("Backups for " + playerName + " at " + position + ":");
         System.out.println(formatPlayerList(service.getBackups(position, player)));
     }
 
+    /**
+     * Formats a player list for demo output.
+     *
+     * @param players players to format
+     * @return formatted players or {@code <NO LIST>} when empty
+     */
     private String formatPlayerList(List<Player> players) {
         if (players.isEmpty()) {
             return "<NO LIST>";

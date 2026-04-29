@@ -2,12 +2,25 @@ package com.fanduel.depthchart.domain;
 
 import com.fanduel.depthchart.exception.DepthChartValidationException;
 
-/** Immutable NFL player identified by jersey number within one team context. */
+/**
+ * Value object for an NFL player.
+ *
+ * @author Xiaoling Cui
+ * @version 2.0
+ */
 
 public final class Player {
     private final int number;
     private final String name;
 
+    /**
+     * Constructs a Player.
+     *
+     * @param number the player number
+     * @param name   the player name
+     * @throws DepthChartValidationException if number is invalid or name is
+     *                                       null/blank
+     */
     public Player(int number, String name) {
         if (number <= 0) {
             throw new DepthChartValidationException("player number must be greater than 0");
@@ -23,10 +36,20 @@ public final class Player {
         this.name = normalizedName;
     }
 
+    /**
+     * Gets the player number.
+     *
+     * @return the player number
+     */
     public int getNumber() {
         return number;
     }
 
+    /**
+     * Gets the player name.
+     *
+     * @return the player name
+     */
     public String getName() {
         return name;
     }

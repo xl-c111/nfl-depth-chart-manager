@@ -8,7 +8,7 @@ import com.fanduel.depthchart.exception.DepthChartValidationException;
  * Value object for NFL depth chart position code.
  *
  * @author Xiaoling Cui
- * @version 1.0
+ * @version 2.0
  */
 public final class Position {
     private final String code;

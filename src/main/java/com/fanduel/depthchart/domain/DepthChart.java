@@ -9,14 +9,23 @@ import java.util.Map;
 import com.fanduel.depthchart.exception.DepthChartValidationException;
 
 /**
- * Aggregate root for depth chart rules.
+ * Aggregate root for depth chart rules and position-based player ordering.
  *
- * Implementation intentionally deferred while project skeleton is being
- * finalized.
+ * @author Xiaoling Cui
+ * @version 3.0
  */
 public class DepthChart {
     private final Map<Position, List<Player>> chart = new LinkedHashMap<>();
 
+    /**
+     * Adds a player at a given position and depth.
+     *
+     * @param position target position
+     * @param player   player to add
+     * @param depth    target depth (null means append)
+     * @throws DepthChartValidationException if inputs are invalid or depth is out
+     *                                       of range
+     */
     public void addPlayer(Position position, Player player, Integer depth) {
         validateRequiredInputs(position, player);
 
@@ -42,6 +51,14 @@ public class DepthChart {
 
     }
 
+    /**
+     * Removes a player from a position.
+     *
+     * @param position target position
+     * @param player   player to remove
+     * @return a single-element list when removed, or empty list when absent
+     * @throws DepthChartValidationException if required inputs are null
+     */
     public List<Player> removePlayer(Position position, Player player) {
         validateRequiredInputs(position, player);
 
@@ -64,6 +81,14 @@ public class DepthChart {
 
     }
 
+    /**
+     * Returns all players behind the given player at a position.
+     *
+     * @param position target position
+     * @param player   reference player
+     * @return players with lower priority depth, or empty list when none
+     * @throws DepthChartValidationException if required inputs are null
+     */
     public List<Player> getBackups(Position position, Player player) {
         validateRequiredInputs(position, player);
 
@@ -90,6 +115,11 @@ public class DepthChart {
         }
     }
 
+    /**
+     * Returns an immutable snapshot of the full depth chart.
+     *
+     * @return unmodifiable map of positions to unmodifiable player lists
+     */
     public Map<Position, List<Player>> snapshot() {
         Map<Position, List<Player>> snapshot = new LinkedHashMap<>();
         for (Map.Entry<Position, List<Player>> entry : chart.entrySet()) {
