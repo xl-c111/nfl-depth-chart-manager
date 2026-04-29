@@ -3,10 +3,13 @@ package com.fanduel.depthchart.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.fanduel.depthchart.exception.DepthChartValidationException;
+
 import static com.fanduel.depthchart.fixture.PlayerFixture.BLAINE_GABBERT;
 import static com.fanduel.depthchart.fixture.PlayerFixture.KYLE_TRASK;
 import static com.fanduel.depthchart.fixture.PlayerFixture.TOM_BRADY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -65,5 +68,19 @@ class DepthChartBackupsTest {
         List<Player> backups = depthChart.getBackups(rb, TOM_BRADY);
 
         assertEquals(List.of(), backups);
+    }
+
+    @Test
+    void getBackups_shouldRejectNullPosition() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> depthChart.getBackups(null, TOM_BRADY));
+    }
+
+    @Test
+    void getBackups_shouldRejectNullPlayer() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> depthChart.getBackups(qb, null));
     }
 }

@@ -19,8 +19,7 @@ public class DepthChart {
     private final Map<Position, List<Player>> chart = new LinkedHashMap<>();
 
     public void addPlayer(Position position, Player player, Integer depth) {
-        Objects.requireNonNull(position, "position must not be null");
-        Objects.requireNonNull(player, "player must not be null");
+        validateRequiredInputs(position, player);
 
         List<Player> playerAtPosition = chart.get(position);
         if (playerAtPosition == null) {
@@ -45,8 +44,7 @@ public class DepthChart {
     }
 
     public List<Player> removePlayer(Position position, Player player) {
-        Objects.requireNonNull(position, "position must not be null");
-        Objects.requireNonNull(player, "player must not be null");
+        validateRequiredInputs(position, player);
 
         List<Player> playerAtPosition = chart.get(position);
         if (playerAtPosition == null) {
@@ -63,8 +61,7 @@ public class DepthChart {
     }
 
     public List<Player> getBackups(Position position, Player player) {
-        Objects.requireNonNull(position, "position must not be null");
-        Objects.requireNonNull(player, "player must not be null");
+        validateRequiredInputs(position, player);
 
         List<Player> playerAtPosition = chart.get(position);
         if (playerAtPosition == null) {
@@ -78,6 +75,15 @@ public class DepthChart {
         }
 
         return List.copyOf(playerAtPosition.subList(playerDepth + 1, playerAtPosition.size()));
+    }
+
+    private void validateRequiredInputs(Position position, Player player) {
+        if (position == null) {
+            throw new DepthChartValidationException("position must not be null");
+        }
+        if (player == null) {
+            throw new DepthChartValidationException("player must not be null");
+        }
     }
 
     public Map<Position, List<Player>> snapshot() {

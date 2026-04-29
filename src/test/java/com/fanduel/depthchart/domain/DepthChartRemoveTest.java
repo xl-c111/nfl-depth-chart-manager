@@ -3,6 +3,8 @@ package com.fanduel.depthchart.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.fanduel.depthchart.exception.DepthChartValidationException;
+
 import java.util.List;
 
 import static com.fanduel.depthchart.fixture.PlayerFixture.BLAINE_GABBERT;
@@ -10,6 +12,7 @@ import static com.fanduel.depthchart.fixture.PlayerFixture.KYLE_TRASK;
 import static com.fanduel.depthchart.fixture.PlayerFixture.TOM_BRADY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DepthChartRemoveTest {
     private DepthChart depthChart;
@@ -63,5 +66,19 @@ class DepthChartRemoveTest {
 
         assertEquals(List.of(), removed);
         assertNull(depthChart.snapshot().get(rb));
+    }
+
+    @Test
+    void removePlayer_shouldRejectNullPosition() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> depthChart.removePlayer(null, TOM_BRADY));
+    }
+
+    @Test
+    void removePlayer_shouldRejectNullPlayer() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> depthChart.removePlayer(qb, null));
     }
 }

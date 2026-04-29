@@ -85,4 +85,18 @@ class DepthChartAddTest {
 
         assertEquals(List.of(BLAINE_GABBERT, TOM_BRADY), qbDepthChart());
     }
+
+    @Test
+    void addPlayer_shouldRejectNullPosition() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> depthChart.addPlayer(null, TOM_BRADY, 0));
+    }
+
+    @Test
+    void addPlayer_shouldRejectNullPlayer() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> depthChart.addPlayer(qb, null, 0));
+    }
 }
