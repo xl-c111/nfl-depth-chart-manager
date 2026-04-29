@@ -17,16 +17,22 @@ class DepthChartAddTest {
     private Position qb;
 
     @BeforeEach
+    // Arrange: setup happens in @BeforeEach
     void setUp() {
         depthChart = new DepthChart();
         qb = Position.of("QB");
+    }
+
+    // get the player list at the position qb
+    private List<Player> qbDepthChart() {
+        return depthChart.snapshot().get(qb);
     }
 
     @Test
     void addPlayer_shouldAppendWhenDepthIsNull() {
         depthChart.addPlayer(qb, TOM_BRADY, null);
 
-        assertEquals(List.of(TOM_BRADY), depthChart.snapshot().get(qb));
+        assertEquals(List.of(TOM_BRADY), qbDepthChart());
     }
 
     @Test
@@ -37,8 +43,9 @@ class DepthChartAddTest {
         depthChart.addPlayer(qb, BLAINE_GABBERT, 1);
 
         assertEquals(
+                // List.of() creates an immutable list with the elements in the given order
                 List.of(TOM_BRADY, BLAINE_GABBERT, KYLE_TRASK),
-                depthChart.snapshot().get(qb));
+                qbDepthChart());
     }
 
     @Test
@@ -47,11 +54,16 @@ class DepthChartAddTest {
 
         depthChart.addPlayer(qb, BLAINE_GABBERT, 1);
 
-        assertEquals(List.of(TOM_BRADY, BLAINE_GABBERT), depthChart.snapshot().get(qb));
+        assertEquals(List.of(TOM_BRADY, BLAINE_GABBERT), qbDepthChart());
     }
 
     @Test
+    // Test logic
+    // Given: a new empty depth chart
+    // When: I add Tom Brady at depth -1
+    // Then: DepthChartValidationException should be thrown
     void addPlayer_shouldRejectNegativeDepth() {
+        // assertThrows: expect this code throw an exception
         assertThrows(
                 DepthChartValidationException.class,
                 () -> depthChart.addPlayer(qb, TOM_BRADY, -1));
@@ -71,6 +83,6 @@ class DepthChartAddTest {
 
         depthChart.addPlayer(qb, TOM_BRADY, 1);
 
-        assertEquals(List.of(BLAINE_GABBERT, TOM_BRADY), depthChart.snapshot().get(qb));
+        assertEquals(List.of(BLAINE_GABBERT, TOM_BRADY), qbDepthChart());
     }
 }
