@@ -16,7 +16,6 @@ import static com.fanduel.depthchart.fixture.PlayerFixture.TOM_BRADY;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -163,5 +162,42 @@ class InMemoryDepthChartServiceTest {
         assertThrows(
                 DepthChartValidationException.class,
                 () -> service.addPlayerToDepthChart("QB", null, 0));
+    }
+
+    @Test
+    void service_shouldSupportSamePlayerAcrossMultiplePositionsIndependently() {
+        Player sharedBackup = new Player(72, "Shared Backup");
+        Player leftTackleStarter = new Player(76, "Left Tackle Starter");
+        Player rightTackleStarter = new Player(78, "Right Tackle Starter");
+
+        service.addPlayerToDepthChart("LT", leftTackleStarter, 0);
+        service.addPlayerToDepthChart("LT", sharedBackup, 1);
+        service.addPlayerToDepthChart("RT", rightTackleStarter, 0);
+        service.addPlayerToDepthChart("RT", sharedBackup, 1);
+
+        assertEquals(List.of(sharedBackup), service.getBackups("LT", leftTackleStarter));
+        assertEquals(List.of(sharedBackup), service.getBackups("RT", rightTackleStarter));
+
+        List<Player> removedFromLt = service.removePlayerFromDepthChart("LT", sharedBackup);
+        assertEquals(List.of(sharedBackup), removedFromLt);
+
+        assertEquals(List.of(), service.getBackups("LT", leftTackleStarter));
+        assertEquals(List.of(sharedBackup), service.getBackups("RT", rightTackleStarter));
+    }
+
+    @Test
+    void getFullDepthChart_shouldKeepStablePositionAndDepthOrder() {
+        service.addPlayerToDepthChart("LWR", MIKE_EVANS, 0);
+        service.addPlayerToDepthChart("QB", TOM_BRADY, 0);
+        service.addPlayerToDepthChart("QB", KYLE_TRASK, 1);
+        service.addPlayerToDepthChart("QB", BLAINE_GABBERT, 1);
+        service.addPlayerToDepthChart("LWR", SCOTT_MILLER, 1);
+        service.addPlayerToDepthChart("LWR", JAELON_DARDEN, 1);
+
+        String expected = String.join(System.lineSeparator(),
+                "LWR - (#13, Mike Evans), (#1, Jaelon Darden), (#10, Scott Miller)",
+                "QB - (#12, Tom Brady), (#11, Blaine Gabbert), (#2, Kyle Trask)");
+
+        assertEquals(expected, service.getFullDepthChart());
     }
 }
