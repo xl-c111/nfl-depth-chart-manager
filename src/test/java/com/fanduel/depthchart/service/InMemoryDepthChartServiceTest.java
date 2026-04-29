@@ -1,6 +1,7 @@
 package com.fanduel.depthchart.service;
 
 import com.fanduel.depthchart.domain.Player;
+import com.fanduel.depthchart.exception.DepthChartValidationException;
 import org.junit.jupiter.api.Test;
 
 import static com.fanduel.depthchart.fixture.PlayerFixture.BLAINE_GABBERT;
@@ -12,6 +13,7 @@ import static com.fanduel.depthchart.fixture.PlayerFixture.TOM_BRADY;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -53,6 +55,15 @@ class InMemoryDepthChartServiceTest {
     }
 
     @Test
+    void getBackups_shouldReturnEmptyListWhenPositionDoesNotMatch() {
+        addSampleDepthChart();
+
+        List<Player> backups = service.getBackups("QB", JAELON_DARDEN);
+
+        assertEquals(List.of(), backups);
+    }
+
+    @Test
     void getFullDepthChart_shouldReturnFormattedSampleDepthChart() {
         addSampleDepthChart();
 
@@ -79,6 +90,25 @@ class InMemoryDepthChartServiceTest {
     }
 
     @Test
+    void removePlayerFromDepthChart_shouldReturnEmptyListWhenPositionDoesNotMatch() {
+        addSampleDepthChart();
+
+        List<Player> removed = service.removePlayerFromDepthChart("WR", MIKE_EVANS);
+
+        assertEquals(List.of(), removed);
+        assertEquals(
+                "QB - (#12, Tom Brady), (#11, Blaine Gabbert), (#2, Kyle Trask)"
+                        + System.lineSeparator()
+                        + "LWR - (#13, Mike Evans), (#1, Jaelon Darden), (#10, Scott Miller)",
+                service.getFullDepthChart());
+    }
+
+    @Test
+    void getFullDepthChart_shouldReturnEmptyStringWhenChartIsEmpty() {
+        assertEquals("", service.getFullDepthChart());
+    }
+
+    @Test
     void addPlayerToDepthChart_shouldNormalizePositionInput() {
         service.addPlayerToDepthChart(" qb ", TOM_BRADY, 0);
 
@@ -88,11 +118,23 @@ class InMemoryDepthChartServiceTest {
     }
 
     @Test
-    void getBackups_shouldReturnEmptyListWhenPositionDoesNotMatch() {
-        addSampleDepthChart();
+    void addPlayerToDepthChart_shouldRejectNullPosition() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> service.addPlayerToDepthChart(null, TOM_BRADY, 0));
+    }
 
-        List<Player> backups = service.getBackups("QB", JAELON_DARDEN);
+    @Test
+    void addPlayerToDepthChart_shouldRejectBlankPosition() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> service.addPlayerToDepthChart("   ", TOM_BRADY, 0));
+    }
 
-        assertEquals(List.of(), backups);
+    @Test
+    void addPlayerToDepthChart_shouldRejectNullPlayer() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> service.addPlayerToDepthChart("QB", null, 0));
     }
 }
