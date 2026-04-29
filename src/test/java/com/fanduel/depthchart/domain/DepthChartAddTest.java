@@ -51,7 +51,6 @@ class DepthChartAddTest {
     @Test
     void addPlayer_shouldAllowDepthEqualToCurrentSize() {
         depthChart.addPlayer(qb, TOM_BRADY, 0);
-
         depthChart.addPlayer(qb, BLAINE_GABBERT, 1);
 
         assertEquals(List.of(TOM_BRADY, BLAINE_GABBERT), qbDepthChart());
@@ -77,16 +76,6 @@ class DepthChartAddTest {
     }
 
     @Test
-    void addPlayer_shouldRepositionExistingPlayerAtSamePosition() {
-        depthChart.addPlayer(qb, TOM_BRADY, 0);
-        depthChart.addPlayer(qb, BLAINE_GABBERT, 1);
-
-        depthChart.addPlayer(qb, TOM_BRADY, 1);
-
-        assertEquals(List.of(BLAINE_GABBERT, TOM_BRADY), qbDepthChart());
-    }
-
-    @Test
     void addPlayer_shouldRejectNullPosition() {
         assertThrows(
                 DepthChartValidationException.class,
@@ -98,5 +87,26 @@ class DepthChartAddTest {
         assertThrows(
                 DepthChartValidationException.class,
                 () -> depthChart.addPlayer(qb, null, 0));
+    }
+
+    @Test
+    void addPlayer_shouldRepositionExistingPlayerAtSamePosition() {
+        depthChart.addPlayer(qb, TOM_BRADY, 0);
+        depthChart.addPlayer(qb, BLAINE_GABBERT, 1);
+        depthChart.addPlayer(qb, TOM_BRADY, 1);
+
+        assertEquals(List.of(BLAINE_GABBERT, TOM_BRADY), qbDepthChart());
+    }
+
+    @Test
+    void addPlayer_shouldTreatSameJerseyNumberIndependentlyAcrossPositions() {
+        Position lwr = Position.of("LWR");
+        Player numberTwelveWideReceiver = new Player(12, "Different #12");
+
+        depthChart.addPlayer(qb, TOM_BRADY, 0);
+        depthChart.addPlayer(lwr, numberTwelveWideReceiver, 0);
+
+        assertEquals(List.of(TOM_BRADY), depthChart.snapshot().get(qb));
+        assertEquals(List.of(numberTwelveWideReceiver), depthChart.snapshot().get(lwr));
     }
 }

@@ -1,18 +1,18 @@
 package com.fanduel.depthchart.domain;
 
+import com.fanduel.depthchart.exception.DepthChartValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fanduel.depthchart.exception.DepthChartValidationException;
-
 import java.util.List;
-
 import static com.fanduel.depthchart.fixture.PlayerFixture.BLAINE_GABBERT;
 import static com.fanduel.depthchart.fixture.PlayerFixture.KYLE_TRASK;
 import static com.fanduel.depthchart.fixture.PlayerFixture.TOM_BRADY;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class DepthChartRemoveTest {
     private DepthChart depthChart;
@@ -61,11 +61,20 @@ class DepthChartRemoveTest {
     @Test
     void removePlayer_shouldReturnEmptyListWhenPositionIsAbsent() {
         Position rb = Position.of("RB");
-
         List<Player> removed = depthChart.removePlayer(rb, TOM_BRADY);
 
         assertEquals(List.of(), removed);
         assertNull(depthChart.snapshot().get(rb));
+    }
+
+    @Test
+    void removePlayer_shouldRemovePositionWhenLastPlayerIsRemoved() {
+        depthChart.addPlayer(qb, TOM_BRADY, 0);
+
+        List<Player> removed = depthChart.removePlayer(qb, TOM_BRADY);
+
+        assertEquals(List.of(TOM_BRADY), removed);
+        assertFalse(depthChart.snapshot().containsKey(qb));
     }
 
     @Test

@@ -54,7 +54,12 @@ public class DepthChart {
         if (!removed) {
             return List.of();
         }
-        // Return the removed player only when it was actually listed at this position.
+
+        // Keep only positions that currently have players on the depth chart
+        if (playerAtPosition.isEmpty()) {
+            chart.remove(position);
+        }
+        // Return the removed player only when it was actually listed at this position
         return List.of(player);
 
     }
