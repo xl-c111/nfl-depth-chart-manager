@@ -4,6 +4,8 @@ import com.fanduel.depthchart.exception.DepthChartValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PositionTest {
@@ -37,5 +39,20 @@ class PositionTest {
 
         assertEquals(lowercase, uppercase);
         assertEquals(lowercase.hashCode(), uppercase.hashCode());
+    }
+
+    @Test
+    void equals_shouldReturnTrueForSameInstance() {
+        Position qb = Position.of("QB");
+
+        assertTrue(qb.equals(qb));
+    }
+
+    @Test
+    void equals_shouldReturnFalseForNullOrDifferentType() {
+        Position qb = Position.of("QB");
+
+        assertFalse(qb.equals(null));
+        assertFalse(qb.equals("QB"));
     }
 }

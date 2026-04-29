@@ -3,7 +3,9 @@ package com.fanduel.depthchart.domain;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PlayerTest {
@@ -31,6 +33,21 @@ class PlayerTest {
         Player blaineGabbert = new Player(11, "Blaine Gabbert");
 
         assertNotEquals(tomBrady, blaineGabbert);
+    }
+
+    @Test
+    void equals_shouldReturnTrueForSameInstance() {
+        Player tomBrady = new Player(12, "Tom Brady");
+
+        assertTrue(tomBrady.equals(tomBrady));
+    }
+
+    @Test
+    void equals_shouldReturnFalseForNullOrDifferentType() {
+        Player tomBrady = new Player(12, "Tom Brady");
+
+        assertFalse(tomBrady.equals(null));
+        assertFalse(tomBrady.equals("Tom Brady"));
     }
 
     @Test

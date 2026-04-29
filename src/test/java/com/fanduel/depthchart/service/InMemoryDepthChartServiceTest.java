@@ -86,4 +86,13 @@ class InMemoryDepthChartServiceTest {
 
         assertEquals("QB - (#12, Tom Brady)", service.getFullDepthChart());
     }
+
+    @Test
+    void getBackups_shouldReturnEmptyListWhenPositionDoesNotMatch() {
+        addSampleDepthChart();
+
+        List<Player> backups = service.getBackups("QB", JAELON_DARDEN);
+
+        assertEquals(List.of(), backups);
+    }
 }
