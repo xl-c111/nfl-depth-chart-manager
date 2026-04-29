@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -54,5 +55,13 @@ class PositionTest {
 
         assertFalse(qb.equals(null));
         assertFalse(qb.equals("QB"));
+    }
+
+    @Test
+    void positionsWithDifferentCodes_shouldNotBeEqual() {
+        Position qb = Position.of("QB");
+        Position rb = Position.of("RB");
+
+        assertNotEquals(qb, rb);
     }
 }
