@@ -59,6 +59,30 @@ class PlayerTest {
     }
 
     @Test
+    void player_shouldRejectBlankName() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> new Player(12, "   "));
+    }
+
+    @Test
+    void player_shouldRejectNonPositiveNumber() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> new Player(0, "Tom Brady"));
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> new Player(-12, "Tom Brady"));
+    }
+
+    @Test
+    void player_shouldTrimName() {
+        Player player = new Player(12, "  Tom Brady  ");
+
+        assertEquals("Tom Brady", player.getName());
+    }
+
+    @Test
     void toString_shouldReturnChallengePlayerFormat() {
         Player player = new Player(12, "Tom Brady");
 

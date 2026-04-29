@@ -1,7 +1,9 @@
 package com.fanduel.depthchart.service;
 
 import com.fanduel.depthchart.domain.Player;
+import com.fanduel.depthchart.domain.DepthChart;
 import com.fanduel.depthchart.exception.DepthChartValidationException;
+import com.fanduel.depthchart.formatter.DepthChartFormatter;
 import org.junit.jupiter.api.Test;
 
 import static com.fanduel.depthchart.fixture.PlayerFixture.BLAINE_GABBERT;
@@ -13,6 +15,7 @@ import static com.fanduel.depthchart.fixture.PlayerFixture.TOM_BRADY;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
@@ -43,6 +46,20 @@ class InMemoryDepthChartServiceTest {
 
         assertDoesNotThrow(
                 () -> service.addPlayerToDepthChart("QB", new Player(12, "Tom Brady"), 0));
+    }
+
+    @Test
+    void constructor_shouldRejectNullDepthChart() {
+        assertThrows(
+                NullPointerException.class,
+                () -> new InMemoryDepthChartService(null, new DepthChartFormatter()));
+    }
+
+    @Test
+    void constructor_shouldRejectNullFormatter() {
+        assertThrows(
+                NullPointerException.class,
+                () -> new InMemoryDepthChartService(new DepthChart(), null));
     }
 
     @Test
@@ -101,6 +118,16 @@ class InMemoryDepthChartServiceTest {
                         + System.lineSeparator()
                         + "LWR - (#13, Mike Evans), (#1, Jaelon Darden), (#10, Scott Miller)",
                 service.getFullDepthChart());
+    }
+
+    @Test
+    void removePlayerFromDepthChart_shouldDropPositionFromFullDepthChartWhenLastPlayerRemoved() {
+        service.addPlayerToDepthChart("QB", TOM_BRADY, 0);
+
+        List<Player> removed = service.removePlayerFromDepthChart("QB", TOM_BRADY);
+
+        assertEquals(List.of(TOM_BRADY), removed);
+        assertEquals("", service.getFullDepthChart());
     }
 
     @Test

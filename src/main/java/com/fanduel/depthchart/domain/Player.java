@@ -5,16 +5,22 @@ import com.fanduel.depthchart.exception.DepthChartValidationException;
 /** Immutable NFL player identified by jersey number within one team context. */
 
 public final class Player {
-    // Player is immutable value obj
     private final int number;
     private final String name;
 
     public Player(int number, String name) {
+        if (number <= 0) {
+            throw new DepthChartValidationException("player number must be greater than 0");
+        }
         if (name == null) {
             throw new DepthChartValidationException("player name must not be null");
         }
+        String normalizedName = name.trim();
+        if (normalizedName.isEmpty()) {
+            throw new DepthChartValidationException("player name must not be blank");
+        }
         this.number = number;
-        this.name = name;
+        this.name = normalizedName;
     }
 
     public int getNumber() {

@@ -5,6 +5,7 @@ import com.fanduel.depthchart.domain.Player;
 import com.fanduel.depthchart.domain.Position;
 import com.fanduel.depthchart.formatter.DepthChartFormatter;
 import java.util.List;
+import java.util.Objects;
 
 /** In-memory service for NFL depth chart use cases. */
 public class InMemoryDepthChartService implements DepthChartService {
@@ -16,8 +17,9 @@ public class InMemoryDepthChartService implements DepthChartService {
     }
 
     public InMemoryDepthChartService(DepthChart depthChart, DepthChartFormatter formatter) {
-        this.depthChart = depthChart;
-        this.formatter = formatter;
+        // Fail fast on null dependencies
+        this.depthChart = Objects.requireNonNull(depthChart, "depthChart must not be null");
+        this.formatter = Objects.requireNonNull(formatter, "formatter must not be null");
     }
 
     @Override
