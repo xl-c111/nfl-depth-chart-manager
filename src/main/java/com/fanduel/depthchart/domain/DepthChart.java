@@ -63,7 +63,21 @@ public class DepthChart {
     }
 
     public List<Player> getBackups(Position position, Player player) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Objects.requireNonNull(position, "position must not be null");
+        Objects.requireNonNull(player, "player must not be null");
+
+        List<Player> playerAtPosition = chart.get(position);
+        if (playerAtPosition == null) {
+            return List.of();
+        }
+
+        int playerDepth = playerAtPosition.indexOf(player);
+        // return empty list for both cases: player not found; player has no backups
+        if (playerDepth == -1 || playerDepth == playerAtPosition.size() - 1) {
+            return List.of();
+        }
+
+        return List.copyOf(playerAtPosition.subList(playerDepth + 1, playerAtPosition.size()));
     }
 
     public Map<Position, List<Player>> snapshot() {
