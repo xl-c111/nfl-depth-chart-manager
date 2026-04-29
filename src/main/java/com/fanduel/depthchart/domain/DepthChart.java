@@ -45,7 +45,21 @@ public class DepthChart {
     }
 
     public List<Player> removePlayer(Position position, Player player) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Objects.requireNonNull(position, "position must not be null");
+        Objects.requireNonNull(player, "player must not be null");
+
+        List<Player> playerAtPosition = chart.get(position);
+        if (playerAtPosition == null) {
+            return List.of();
+        }
+
+        boolean removed = playerAtPosition.remove(player);
+        if (!removed) {
+            return List.of();
+        }
+        // Return the removed player only when it was actually listed at this position.
+        return List.of(player);
+
     }
 
     public List<Player> getBackups(Position position, Player player) {
