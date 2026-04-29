@@ -1,5 +1,6 @@
 package com.fanduel.depthchart.domain;
 
+import com.fanduel.depthchart.exception.DepthChartValidationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,7 +54,7 @@ class PlayerTest {
     @Test
     void player_shouldRejectNullName() {
         assertThrows(
-                NullPointerException.class,
+                DepthChartValidationException.class,
                 () -> new Player(12, null));
     }
 

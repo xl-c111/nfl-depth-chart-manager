@@ -1,15 +1,20 @@
 package com.fanduel.depthchart.domain;
 
-import java.util.Objects;
+import com.fanduel.depthchart.exception.DepthChartValidationException;
 
 /** Immutable NFL player identified by jersey number within one team context. */
+
 public final class Player {
+    // Player is immutable value obj
     private final int number;
     private final String name;
 
     public Player(int number, String name) {
+        if (name == null) {
+            throw new DepthChartValidationException("player name must not be null");
+        }
         this.number = number;
-        this.name = Objects.requireNonNull(name, "name must not be null");
+        this.name = name;
     }
 
     public int getNumber() {
