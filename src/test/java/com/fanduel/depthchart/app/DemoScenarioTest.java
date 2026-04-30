@@ -28,6 +28,7 @@ class DemoScenarioTest {
 
         String output = buffer.toString(StandardCharsets.UTF_8);
         assertTrue(output.contains("Backups for Tom Brady at QB:"));
+        assertTrue(output.contains("#11 - Blaine Gabbert"));
         assertTrue(output.contains("Full depth chart:"));
         assertTrue(output.contains("Removed from LWR:"));
         assertTrue(output.contains("Full depth chart after removal:"));

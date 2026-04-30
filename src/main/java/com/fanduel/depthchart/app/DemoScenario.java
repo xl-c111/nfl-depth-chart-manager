@@ -1,8 +1,14 @@
 package com.fanduel.depthchart.app;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fanduel.depthchart.domain.Player;
 import com.fanduel.depthchart.formatter.DepthChartFormatter;
 import com.fanduel.depthchart.service.DepthChartService;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +18,8 @@ import java.util.List;
  * @version 1.0
  */
 public class DemoScenario {
+    private static final String SAMPLE_DATA_PATH = "data/tb-depth-chart-sample.json";
+
     private final DepthChartService service;
     private final DepthChartFormatter formatter;
 
@@ -39,20 +47,13 @@ public class DemoScenario {
      * Runs the full sample scenario from the challenge prompt.
      */
     public void run() {
+        seedSampleDepthChartFromJson();
+
         Player tomBrady = new Player(12, "Tom Brady");
         Player blaineGabbert = new Player(11, "Blaine Gabbert");
         Player kyleTrask = new Player(2, "Kyle Trask");
         Player mikeEvans = new Player(13, "Mike Evans");
         Player jaelonDarden = new Player(1, "Jaelon Darden");
-        Player scottMiller = new Player(10, "Scott Miller");
-
-        seedSampleDepthChart(
-                tomBrady,
-                blaineGabbert,
-                kyleTrask,
-                mikeEvans,
-                jaelonDarden,
-                scottMiller);
 
         printBackups("Tom Brady", "QB", tomBrady);
         printBackups("Jaelon Darden", "LWR", jaelonDarden);
@@ -74,20 +75,98 @@ public class DemoScenario {
         System.out.println(formatter.format(service.getFullDepthChart()));
     }
 
-    private void seedSampleDepthChart(
-            Player tomBrady,
-            Player blaineGabbert,
-            Player kyleTrask,
-            Player mikeEvans,
-            Player jaelonDarden,
-            Player scottMiller) {
-        service.addPlayerToDepthChart("QB", tomBrady, 0);
-        service.addPlayerToDepthChart("QB", blaineGabbert, 1);
-        service.addPlayerToDepthChart("QB", kyleTrask, 2);
+    /**
+     * Loads the demo depth chart rows from the bundled JSON file and seeds the service.
+     */
+    private void seedSampleDepthChartFromJson() {
+        try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(SAMPLE_DATA_PATH)) {
+            if (input == null) {
+                throw new IllegalStateException("sample data file not found: " + SAMPLE_DATA_PATH);
+            }
 
-        service.addPlayerToDepthChart("LWR", mikeEvans, 0);
-        service.addPlayerToDepthChart("LWR", jaelonDarden, 1);
-        service.addPlayerToDepthChart("LWR", scottMiller, 2);
+            List<DepthChartRow> rows = parseRows(input);
+            for (DepthChartRow row : rows) {
+                service.addPlayerToDepthChart(
+                        row.position(),
+                        new Player(row.number(), row.name()),
+                        row.depth());
+            }
+        } catch (IOException exception) {
+            throw new IllegalStateException("failed to load sample depth chart data", exception);
+        }
+    }
+
+    /**
+     * Parses depth chart rows from a JSON array input stream.
+     *
+     * @param input JSON input stream containing an array of row objects
+     * @return parsed depth chart rows
+     * @throws IOException if parsing fails
+     */
+    private List<DepthChartRow> parseRows(InputStream input) throws IOException {
+        JsonFactory factory = new JsonFactory();
+        List<DepthChartRow> rows = new ArrayList<>();
+        try (JsonParser parser = factory.createParser(input)) {
+            if (parser.nextToken() != JsonToken.START_ARRAY) {
+                throw new IllegalStateException("sample data must be a JSON array");
+            }
+
+            while (parser.nextToken() != JsonToken.END_ARRAY) {
+                rows.add(parseRow(parser));
+            }
+        }
+        return rows;
+    }
+
+    /**
+     * Parses a single depth chart row object.
+     *
+     * @param parser JSON parser positioned at {@code START_OBJECT}
+     * @return parsed depth chart row
+     * @throws IOException if parsing fails
+     */
+    private DepthChartRow parseRow(JsonParser parser) throws IOException {
+        if (parser.currentToken() != JsonToken.START_OBJECT) {
+            throw new IllegalStateException("sample row must be a JSON object");
+        }
+
+        Integer number = null;
+        String name = null;
+        String position = null;
+        Integer depth = null;
+
+        while (parser.nextToken() != JsonToken.END_OBJECT) {
+            String fieldName = parser.getCurrentName();
+            parser.nextToken();
+
+            if ("number".equals(fieldName)) {
+                number = parser.getIntValue();
+            } else if ("name".equals(fieldName)) {
+                name = parser.getValueAsString();
+            } else if ("position".equals(fieldName)) {
+                position = parser.getValueAsString();
+            } else if ("depth".equals(fieldName)) {
+                depth = parser.currentToken() == JsonToken.VALUE_NULL ? null : parser.getIntValue();
+            } else {
+                parser.skipChildren();
+            }
+        }
+
+        if (number == null || name == null || position == null) {
+            throw new IllegalStateException("sample row missing required fields: number, name, position");
+        }
+        return new DepthChartRow(number, name, position, depth);
+    }
+
+    /**
+     * Represents one depth chart input row.
+     *
+     * @param number jersey number
+     * @param name player name
+     * @param position position code
+     * @param depth position depth (null means append)
+     */
+    private record DepthChartRow(int number, String name, String position, Integer depth) {
     }
 
     /**

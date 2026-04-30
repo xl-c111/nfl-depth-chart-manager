@@ -1,0 +1,8 @@
+[
+  { "number": 12, "name": "Tom Brady", "position": "QB", "depth": 0 },
+  { "number": 11, "name": "Blaine Gabbert", "position": "QB", "depth": 1 },
+  { "number": 2, "name": "Kyle Trask", "position": "QB", "depth": 2 },
+  { "number": 13, "name": "Mike Evans", "position": "LWR", "depth": 0 },
+  { "number": 1, "name": "Jaelon Darden", "position": "LWR", "depth": 1 },
+  { "number": 10, "name": "Scott Miller", "position": "LWR", "depth": 2 }
+]
