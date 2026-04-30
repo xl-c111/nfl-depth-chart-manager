@@ -99,6 +99,15 @@ class DepthChartAddTest {
     }
 
     @Test
+    void addPlayer_shouldMoveExistingPlayerToEndWhenDepthIsNull() {
+        depthChart.addPlayer(qb, TOM_BRADY, 0);
+        depthChart.addPlayer(qb, BLAINE_GABBERT, 1);
+        depthChart.addPlayer(qb, TOM_BRADY, null);
+
+        assertEquals(List.of(BLAINE_GABBERT, TOM_BRADY), qbDepthChart());
+    }
+
+    @Test
     void addPlayer_shouldAllowRepositionExistingPlayerToEndWithDepthEqualOriginalSize() {
         depthChart.addPlayer(qb, TOM_BRADY, 0);
         depthChart.addPlayer(qb, BLAINE_GABBERT, 1);

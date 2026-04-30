@@ -14,6 +14,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class DemoScenarioTest {
 
     @Test
+    void run_shouldWorkWithTwoArgConstructorUsingDefaultSamplePath() {
+        DemoScenario scenario = new DemoScenario(
+                new InMemoryDepthChartService(),
+                new com.fanduel.depthchart.formatter.DepthChartFormatter());
+
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try {
+            System.setOut(new PrintStream(buffer, true, StandardCharsets.UTF_8));
+            scenario.run();
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        String output = buffer.toString(StandardCharsets.UTF_8);
+        assertTrue(output.contains("Full depth chart:"));
+    }
+
+    @Test
     void run_shouldPrintKeySampleSections() {
         DepthChartService service = new InMemoryDepthChartService();
         DemoScenario scenario = new DemoScenario(service);
@@ -80,6 +99,39 @@ class DemoScenarioTest {
     }
 
     @Test
+    void run_shouldThrowWhenNameIsMissing() {
+        DemoScenario scenario = new DemoScenario(
+                new InMemoryDepthChartService(),
+                new com.fanduel.depthchart.formatter.DepthChartFormatter(),
+                "data/missing-required-name.json");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        assertTrue(exception.getMessage().contains("sample row missing required fields"));
+    }
+
+    @Test
+    void run_shouldThrowWhenNumberIsMissing() {
+        DemoScenario scenario = new DemoScenario(
+                new InMemoryDepthChartService(),
+                new com.fanduel.depthchart.formatter.DepthChartFormatter(),
+                "data/missing-required-number.json");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        assertTrue(exception.getMessage().contains("sample row missing required fields"));
+    }
+
+    @Test
+    void run_shouldThrowWhenPositionIsMissing() {
+        DemoScenario scenario = new DemoScenario(
+                new InMemoryDepthChartService(),
+                new com.fanduel.depthchart.formatter.DepthChartFormatter(),
+                "data/missing-required-position.json");
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        assertTrue(exception.getMessage().contains("sample row missing required fields"));
+    }
+
+    @Test
     void run_shouldThrowWhenNumberTypeIsInvalid() {
         DemoScenario scenario = new DemoScenario(
                 new InMemoryDepthChartService(),
@@ -108,6 +160,27 @@ class DemoScenarioTest {
 
         String output = buffer.toString(StandardCharsets.UTF_8);
         assertTrue(output.contains("QB - (#12, Tom Brady), (#11, Blaine Gabbert), (#2, Kyle Trask)"));
+    }
+
+    @Test
+    void run_shouldIgnoreUnknownFieldsInRowObjects() {
+        DemoScenario scenario = new DemoScenario(
+                new InMemoryDepthChartService(),
+                new com.fanduel.depthchart.formatter.DepthChartFormatter(),
+                "data/valid-with-unknown-field.json");
+
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try {
+            System.setOut(new PrintStream(buffer, true, StandardCharsets.UTF_8));
+            scenario.run();
+        } finally {
+            System.setOut(originalOut);
+        }
+
+        String output = buffer.toString(StandardCharsets.UTF_8);
+        assertTrue(output.contains("Backups for Tom Brady at QB:"));
+        assertTrue(output.contains("#11 - Blaine Gabbert"));
     }
 
     @Test
