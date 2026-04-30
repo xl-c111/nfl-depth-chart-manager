@@ -6,7 +6,7 @@ import com.fanduel.depthchart.exception.DepthChartValidationException;
  * Value object for an NFL player.
  *
  * @author Xiaoling Cui
- * @version 2.0
+ * @version 3.0
  */
 
 public final class Player {
@@ -18,12 +18,16 @@ public final class Player {
      *
      * @param number the player number
      * @param name   the player name
-     * @throws DepthChartValidationException if number is invalid or name is
+     * @throws DepthChartValidationException if number is outside {@code [0, 99]}
+     *                                       or name is
      *                                       null/blank
      */
     public Player(int number, String name) {
-        if (number <= 0) {
-            throw new DepthChartValidationException("player number must be greater than 0");
+        if (number < 0) {
+            throw new DepthChartValidationException("player number must not be negative");
+        }
+        if (number > 99) {
+            throw new DepthChartValidationException("player number must be between 0 and 99");
         }
         if (name == null) {
             throw new DepthChartValidationException("player name must not be null");
