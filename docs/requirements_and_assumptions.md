@@ -7,6 +7,7 @@ This document captures the functional contract and implementation decisions for 
 - Single NFL team
 - In-memory state only
 - Java service API (no external API endpoint)
+- Demo initialization from a bundled local JSON file
 
 ## Required Use Cases
 1. `addPlayerToDepthChart(position, player, positionDepth)`
@@ -21,7 +22,7 @@ This document captures the functional contract and implementation decisions for 
 - Depth is zero-based.
 - Inserted player takes priority; existing players at and below that index shift down.
 - Invalid depth (`< 0` or `> current size`) throws `DepthChartValidationException`.
-- Re-adding the same player to the same position is treated as reposition: remove current occurrence, then insert.
+- Re-adding the same player at the same position is treated as reposition (not duplication): remove current occurrence, then insert; `positionDepth == current size` is valid and moves that player to the end.
 
 ### `removePlayerFromDepthChart(position, player)`
 - Removes `player` from `position`.
@@ -30,8 +31,7 @@ This document captures the functional contract and implementation decisions for 
 
 ### `getBackups(position, player)`
 - Returns all players below `player` at the specified `position`.
-- Returns empty list when player has no backups.
-- Returns empty list when player is not listed at that position.
+- Returns empty list when player has no backups or is not listed at that position.
 
 ### `getFullDepthChart()`
 - Returns full depth chart for all positions currently present.
@@ -45,19 +45,19 @@ This document captures the functional contract and implementation decisions for 
 
 ## Challenge Sample Inconsistencies and Resolution
 1. Sample call `getBackups("QB", JaelonDarden)` conflicts with setup (`JaelonDarden` added at `LWR`).
-- Resolution: treated as sample typo; tests validate backups with correct position context.
+Resolution: treated as sample typo; tests validate backups with correct position context.
 
 2. Sample call `removePlayerFromDepthChart("WR", MikeEvans)` conflicts with setup (`LWR`).
-- Resolution: treated as sample typo; implementation uses strict normalized position key matching.
+Resolution: treated as sample typo; implementation uses strict normalized position key matching.
 
 3. Sample JSON occasionally shows key `"number "` (trailing space).
-- Resolution: treated as documentation typo; typed model fields are authoritative.
+Resolution: treated as documentation typo; typed model fields are authoritative.
 
 ## Non-Goals
 1. Persistence/database integration.
 2. REST/GraphQL API layer.
-3. PDF/webpage ingestion/parsing.
+3. PDF/webpage ingestion/parsing from external sources (demo uses bundled local JSON only).
 4. Multi-team abstraction beyond current single-team scope.
 
 ## Concurrency
-Current target is non-thread-safe in-memory behavior, which is acceptable for challenge scope. If concurrency becomes a requirement, add synchronization or immutable snapshot strategy.
+Current target is non-thread-safe in-memory behavior, which is acceptable for challenge scope. If concurrency is required, introduce synchronization or an immutable snapshot/update strategy.
