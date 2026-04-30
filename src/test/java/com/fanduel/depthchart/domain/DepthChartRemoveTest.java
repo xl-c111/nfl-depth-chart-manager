@@ -78,6 +78,17 @@ class DepthChartRemoveTest {
     }
 
     @Test
+    void removePlayer_shouldReturnActualRemovedInstanceFromDepthChart() {
+        Player canonical = new Player(12, "Tom Brady");
+        Player requestVariant = new Player(12, "TOm BrADY");
+        depthChart.addPlayer(qb, canonical, 0);
+
+        List<Player> removed = depthChart.removePlayer(qb, requestVariant);
+
+        assertEquals(List.of(canonical), removed);
+    }
+
+    @Test
     void removePlayer_shouldRejectNullPosition() {
         assertThrows(
                 DepthChartValidationException.class,

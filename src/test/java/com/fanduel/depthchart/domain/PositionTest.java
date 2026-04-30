@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PositionTest {
 
     @Test
-    void of_shouldNormalizePositionCode() {
+    void shouldNormalizePositionCodeWhenCreatingPosition() {
         Position position = Position.of(" qb ");
 
         assertEquals("QB", position.getCode());
@@ -20,21 +20,28 @@ class PositionTest {
     }
 
     @Test
-    void of_shouldRejectNullCode() {
+    void shouldRejectNullCodeWhenCreatingPosition() {
         assertThrows(
                 DepthChartValidationException.class,
                 () -> Position.of(null));
     }
 
     @Test
-    void of_shouldRejectBlankCode() {
+    void shouldRejectBlankCodeWhenCreatingPosition() {
         assertThrows(
                 DepthChartValidationException.class,
                 () -> Position.of("   "));
     }
 
     @Test
-    void positionsWithSameNormalizedCode_shouldBeEqual() {
+    void shouldRejectUnsupportedNflPositionCodeWhenCreatingPosition() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> Position.of("XYZ"));
+    }
+
+    @Test
+    void shouldBeEqualWhenPositionsHaveSameNormalizedCode() {
         Position lowercase = Position.of("qb");
         Position uppercase = Position.of("QB");
 
@@ -43,14 +50,14 @@ class PositionTest {
     }
 
     @Test
-    void equals_shouldReturnTrueForSameInstance() {
+    void shouldReturnTrueWhenEqualsCalledWithSameInstance() {
         Position qb = Position.of("QB");
 
         assertTrue(qb.equals(qb));
     }
 
     @Test
-    void equals_shouldReturnFalseForNullOrDifferentType() {
+    void shouldReturnFalseWhenEqualsCalledWithNullOrDifferentType() {
         Position qb = Position.of("QB");
 
         assertFalse(qb.equals(null));
@@ -58,7 +65,7 @@ class PositionTest {
     }
 
     @Test
-    void positionsWithDifferentCodes_shouldNotBeEqual() {
+    void shouldNotBeEqualWhenPositionsHaveDifferentCodes() {
         Position qb = Position.of("QB");
         Position rb = Position.of("RB");
 

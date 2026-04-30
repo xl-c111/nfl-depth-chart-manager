@@ -42,14 +42,6 @@ class InMemoryDepthChartServiceTest {
     }
 
     @Test
-    void addPlayerToDepthChart_shouldSucceedAfterAddLogicIsImplemented() {
-        DepthChartService service = new InMemoryDepthChartService();
-
-        assertDoesNotThrow(
-                () -> service.addPlayerToDepthChart("QB", new Player(12, "Tom Brady"), 0));
-    }
-
-    @Test
     void constructor_shouldRejectNullDepthChart() {
         assertThrows(
                 NullPointerException.class,
@@ -167,6 +159,13 @@ class InMemoryDepthChartServiceTest {
     }
 
     @Test
+    void addPlayerToDepthChart_shouldRejectUnsupportedNflPositionCode() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> service.addPlayerToDepthChart("XYZ", TOM_BRADY, 0));
+    }
+
+    @Test
     void addPlayerToDepthChart_shouldRejectNullPlayer() {
         assertThrows(
                 DepthChartValidationException.class,
@@ -174,7 +173,7 @@ class InMemoryDepthChartServiceTest {
     }
 
     @Test
-    void service_shouldSupportSamePlayerAcrossMultiplePositionsIndependently() {
+    void shouldSupportIndependentDepthAcrossPositionsWhenPlayerIsShared() {
         Player sharedBackup = new Player(72, "Shared Backup");
         Player leftTackleStarter = new Player(76, "Left Tackle Starter");
         Player rightTackleStarter = new Player(78, "Right Tackle Starter");
@@ -192,6 +191,34 @@ class InMemoryDepthChartServiceTest {
 
         assertEquals(List.of(), service.getBackups("LT", leftTackleStarter));
         assertEquals(List.of(sharedBackup), service.getBackups("RT", rightTackleStarter));
+    }
+
+    @Test
+    void shouldRejectSameNumberWithDifferentNameWhenAddingPlayerInTeamContext() {
+        service.addPlayerToDepthChart("QB", new Player(12, "Tom Brady"), 0);
+
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> service.addPlayerToDepthChart("LWR", new Player(12, "Different Name"), 0));
+    }
+
+    @Test
+    void shouldAllowSameNumberWhenNameDiffersOnlyByCaseInTeamContext() {
+        service.addPlayerToDepthChart("QB", new Player(12, "Tom Brady"), 0);
+
+        assertDoesNotThrow(
+                () -> service.addPlayerToDepthChart("LWR", new Player(12, "TOm BrADY"), 0));
+    }
+
+    @Test
+    void removePlayerFromDepthChart_shouldReturnActualRemovedInstance() {
+        Player canonical = new Player(12, "Tom Brady");
+        Player requestVariant = new Player(12, "TOm BrADY");
+        service.addPlayerToDepthChart("QB", canonical, 0);
+
+        List<Player> removed = service.removePlayerFromDepthChart("QB", requestVariant);
+
+        assertEquals(List.of(canonical), removed);
     }
 
     @Test

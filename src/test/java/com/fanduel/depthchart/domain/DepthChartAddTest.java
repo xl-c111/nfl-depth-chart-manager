@@ -17,13 +17,11 @@ class DepthChartAddTest {
     private Position qb;
 
     @BeforeEach
-    // Arrange: setup happens in @BeforeEach
     void setUp() {
         depthChart = new DepthChart();
         qb = Position.of("QB");
     }
 
-    // get the player list at the position qb
     private List<Player> qbDepthChart() {
         return depthChart.snapshot().get(qb);
     }
@@ -57,12 +55,7 @@ class DepthChartAddTest {
     }
 
     @Test
-    // Test logic
-    // Given: a new empty depth chart
-    // When: I add Tom Brady at depth -1
-    // Then: DepthChartValidationException should be thrown
     void addPlayer_shouldRejectNegativeDepth() {
-        // assertThrows: expect this code throw an exception
         assertThrows(
                 DepthChartValidationException.class,
                 () -> depthChart.addPlayer(qb, TOM_BRADY, -1));
@@ -119,14 +112,38 @@ class DepthChartAddTest {
     }
 
     @Test
-    void addPlayer_shouldTreatSameJerseyNumberIndependentlyAcrossPositions() {
+    void addPlayer_shouldAllowSameJerseyNumberAcrossPositionsWhenNameIsConsistent() {
         Position lwr = Position.of("LWR");
-        Player numberTwelveWideReceiver = new Player(12, "Different #12");
+        Player numberTwelveWideReceiver = new Player(12, "Tom Brady");
 
         depthChart.addPlayer(qb, TOM_BRADY, 0);
         depthChart.addPlayer(lwr, numberTwelveWideReceiver, 0);
 
         assertEquals(List.of(TOM_BRADY), depthChart.snapshot().get(qb));
         assertEquals(List.of(numberTwelveWideReceiver), depthChart.snapshot().get(lwr));
+    }
+
+    @Test
+    void addPlayer_shouldRejectSameNumberWithDifferentNameAcrossPositions() {
+        Position lwr = Position.of("LWR");
+        Player sameNumberDifferentName = new Player(12, "Different #12");
+
+        depthChart.addPlayer(qb, TOM_BRADY, 0);
+
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> depthChart.addPlayer(lwr, sameNumberDifferentName, 0));
+    }
+
+    @Test
+    void addPlayer_shouldAllowSameNumberWhenNameDiffersOnlyByCase() {
+        Position lwr = Position.of("LWR");
+        Player sameNumberCaseVariant = new Player(12, "TOm BrADY");
+
+        depthChart.addPlayer(qb, TOM_BRADY, 0);
+        depthChart.addPlayer(lwr, sameNumberCaseVariant, 0);
+
+        assertEquals(List.of(TOM_BRADY), depthChart.snapshot().get(qb));
+        assertEquals(List.of(sameNumberCaseVariant), depthChart.snapshot().get(lwr));
     }
 }

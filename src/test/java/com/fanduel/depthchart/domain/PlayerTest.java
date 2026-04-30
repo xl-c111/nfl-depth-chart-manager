@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PlayerTest {
 
     @Test
-    void player_shouldExposeNumberAndName() {
+    void shouldExposeNumberAndNameWhenPlayerIsConstructed() {
         Player player = new Player(12, "Tom Brady");
 
         assertEquals(12, player.getNumber());
@@ -20,7 +20,7 @@ class PlayerTest {
     }
 
     @Test
-    void playersWithSameNumber_shouldBeEqualEvenWhenNameDiffers() {
+    void shouldBeEqualWhenPlayersShareSameNumber() {
         Player tomBrady = new Player(12, "Tom Brady");
         Player renamedPlayer = new Player(12, "Different Name");
 
@@ -29,7 +29,7 @@ class PlayerTest {
     }
 
     @Test
-    void playersWithDifferentNumbers_shouldNotBeEqual() {
+    void shouldNotBeEqualWhenPlayersHaveDifferentNumbers() {
         Player tomBrady = new Player(12, "Tom Brady");
         Player blaineGabbert = new Player(11, "Blaine Gabbert");
 
@@ -37,14 +37,14 @@ class PlayerTest {
     }
 
     @Test
-    void equals_shouldReturnTrueForSameInstance() {
+    void shouldReturnTrueWhenEqualsCalledWithSameInstance() {
         Player tomBrady = new Player(12, "Tom Brady");
 
         assertTrue(tomBrady.equals(tomBrady));
     }
 
     @Test
-    void equals_shouldReturnFalseForNullOrDifferentType() {
+    void shouldReturnFalseWhenEqualsCalledWithNullOrDifferentType() {
         Player tomBrady = new Player(12, "Tom Brady");
 
         assertFalse(tomBrady.equals(null));
@@ -52,38 +52,49 @@ class PlayerTest {
     }
 
     @Test
-    void player_shouldRejectNullName() {
+    void shouldRejectNullNameWhenConstructingPlayer() {
         assertThrows(
                 DepthChartValidationException.class,
                 () -> new Player(12, null));
     }
 
     @Test
-    void player_shouldRejectBlankName() {
+    void shouldRejectBlankNameWhenConstructingPlayer() {
         assertThrows(
                 DepthChartValidationException.class,
                 () -> new Player(12, "   "));
     }
 
     @Test
-    void player_shouldRejectNonPositiveNumber() {
-        assertThrows(
-                DepthChartValidationException.class,
-                () -> new Player(0, "Tom Brady"));
+    void shouldAllowZeroNumberWhenConstructingPlayer() {
+        Player player = new Player(0, "Zero Number");
+
+        assertEquals(0, player.getNumber());
+    }
+
+    @Test
+    void shouldRejectNegativeNumberWhenConstructingPlayer() {
         assertThrows(
                 DepthChartValidationException.class,
                 () -> new Player(-12, "Tom Brady"));
     }
 
     @Test
-    void player_shouldTrimName() {
+    void shouldRejectNumberGreaterThanNinetyNineWhenConstructingPlayer() {
+        assertThrows(
+                DepthChartValidationException.class,
+                () -> new Player(100, "Too Large"));
+    }
+
+    @Test
+    void shouldTrimNameWhenConstructingPlayer() {
         Player player = new Player(12, "  Tom Brady  ");
 
         assertEquals("Tom Brady", player.getName());
     }
 
     @Test
-    void toString_shouldReturnChallengePlayerFormat() {
+    void shouldReturnChallengeFormatWhenConvertingPlayerToString() {
         Player player = new Player(12, "Tom Brady");
 
         assertEquals("(#12, Tom Brady)", player.toString());
