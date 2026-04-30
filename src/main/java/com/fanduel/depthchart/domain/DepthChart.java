@@ -35,16 +35,28 @@ public class DepthChart {
             chart.put(position, playerAtPosition);
         }
 
-        // treat re-add as reposition
-        playerAtPosition.remove(player);
+        // Validate requested depth against the pre-change list size.
+        int originalSize = playerAtPosition.size();
+        // Re-adding the same player at this position means repositioning, not duplicating.
+        boolean alreadyExists = playerAtPosition.contains(player);
 
         if (depth == null) {
+            // Null depth means append; for an existing player this becomes "move to end".
+            if (alreadyExists) {
+                playerAtPosition.remove(player);
+            }
             playerAtPosition.add(player);
             return;
         }
-        if (depth < 0 || depth > playerAtPosition.size()) {
+        if (depth < 0 || depth > originalSize) {
             throw new DepthChartValidationException(
                     "depth must be between 0 and current size for position " + position);
+        }
+
+        if (alreadyExists) {
+            playerAtPosition.remove(player);
+            // If depth equals original size, removal shrinks the list by one; clamp to tail index.
+            depth = Math.min(depth, playerAtPosition.size());
         }
 
         playerAtPosition.add(depth, player);
@@ -72,7 +84,7 @@ public class DepthChart {
             return List.of();
         }
 
-        // Keep only positions that currently have players on the depth chart
+        // Keep snapshots compact by removing empty positions entirely.
         if (playerAtPosition.isEmpty()) {
             chart.remove(position);
         }
@@ -98,7 +110,7 @@ public class DepthChart {
         }
 
         int playerDepth = playerAtPosition.indexOf(player);
-        // return empty list for both cases: player not found; player has no backups
+        // Contract: both "not listed" and "no players behind" return an empty list.
         if (playerDepth == -1 || playerDepth == playerAtPosition.size() - 1) {
             return List.of();
         }

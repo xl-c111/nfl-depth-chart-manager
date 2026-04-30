@@ -99,6 +99,17 @@ class DepthChartAddTest {
     }
 
     @Test
+    void addPlayer_shouldAllowRepositionExistingPlayerToEndWithDepthEqualOriginalSize() {
+        depthChart.addPlayer(qb, TOM_BRADY, 0);
+        depthChart.addPlayer(qb, BLAINE_GABBERT, 1);
+        depthChart.addPlayer(qb, KYLE_TRASK, 2);
+
+        depthChart.addPlayer(qb, TOM_BRADY, 3);
+
+        assertEquals(List.of(BLAINE_GABBERT, KYLE_TRASK, TOM_BRADY), qbDepthChart());
+    }
+
+    @Test
     void addPlayer_shouldTreatSameJerseyNumberIndependentlyAcrossPositions() {
         Position lwr = Position.of("LWR");
         Player numberTwelveWideReceiver = new Player(12, "Different #12");
