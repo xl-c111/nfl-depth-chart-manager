@@ -13,6 +13,7 @@ mvn test
 mvn -q exec:java -Dexec.mainClass="com.fanduel.depthchart.app.DepthChartApplication"
 ```
 The demo seeds data from `src/main/resources/data/tb-depth-chart-sample.json`.
+CI runs `mvn test` automatically on every push and pull request via GitHub Actions.
 
 ## Implemented Use Cases
 The required use cases from the challenge are implemented through `DepthChartService`:
