@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.fanduel.depthchart.exception.DepthChartValidationException;
@@ -28,8 +29,9 @@ public class DepthChart {
      * @throws DepthChartValidationException if inputs are invalid or depth is out
      *                                       of range
      */
-    public void addPlayer(Position position, Player player, Integer depth) {
+    public synchronized void addPlayer(Position position, Player player, Integer depth) {
         validateRequiredInputs(position, player);
+        validatePlayerIdentityConsistency(player);
 
         List<Player> playerAtPosition = chart.get(position);
         if (playerAtPosition == null) {
@@ -39,7 +41,8 @@ public class DepthChart {
 
         // Validate requested depth against the pre-change list size.
         int originalSize = playerAtPosition.size();
-        // Re-adding the same player at this position means repositioning, not duplicating.
+        // Re-adding the same player at this position means repositioning, not
+        // duplicating.
         boolean alreadyExists = playerAtPosition.contains(player);
 
         if (depth == null) {
@@ -57,12 +60,46 @@ public class DepthChart {
 
         if (alreadyExists) {
             playerAtPosition.remove(player);
-            // If depth equals original size, removal shrinks the list by one; clamp to tail index.
+            // If depth equals original size, removal shrinks the list by one; clamp to tail
+            // index.
             depth = Math.min(depth, playerAtPosition.size());
         }
 
         playerAtPosition.add(depth, player);
+    }
 
+    /**
+     * Enforces single-team identity consistency:
+     * jersey number is the unique identity, and name must remain consistent for
+     * that number.
+     *
+     * @param candidate player being inserted or repositioned
+     * @throws DepthChartValidationException when the same number already exists
+     *                                       with a
+     *                                       materially different name
+     */
+    private void validatePlayerIdentityConsistency(Player candidate) {
+        for (List<Player> players : chart.values()) {
+            for (Player existing : players) {
+                if (existing.getNumber() == candidate.getNumber()
+                        && !namesEquivalent(existing.getName(), candidate.getName())) {
+                    throw new DepthChartValidationException(
+                            "player number " + candidate.getNumber()
+                                    + " already exists with a different name in this team context");
+                }
+            }
+        }
+    }
+
+    /**
+     * Compares two player names using case-insensitive equality.
+     *
+     * @param left  first name
+     * @param right second name
+     * @return true when names are equal ignoring character case
+     */
+    private boolean namesEquivalent(String left, String right) {
+        return left.toLowerCase(Locale.ROOT).equals(right.toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -74,7 +111,7 @@ public class DepthChart {
      *         this position
      * @throws DepthChartValidationException if required inputs are null
      */
-    public List<Player> removePlayer(Position position, Player player) {
+    public synchronized List<Player> removePlayer(Position position, Player player) {
         validateRequiredInputs(position, player);
 
         List<Player> playerAtPosition = chart.get(position);
@@ -82,18 +119,21 @@ public class DepthChart {
             return List.of();
         }
 
-        boolean removed = playerAtPosition.remove(player);
-        if (!removed) {
+        int removedIndex = playerAtPosition.indexOf(player);
+        if (removedIndex < 0) {
             return List.of();
         }
+
+        // Remove by index so we return the player stored in the chart,
+        // not the player object passed in by the caller.
+        Player removedPlayer = playerAtPosition.remove(removedIndex);
 
         // Keep snapshots compact by removing empty positions entirely.
         if (playerAtPosition.isEmpty()) {
             chart.remove(position);
         }
         // Return the removed player only when it was actually listed at this position
-        return List.of(player);
-
+        return List.of(removedPlayer);
     }
 
     /**
@@ -105,7 +145,7 @@ public class DepthChart {
      *         the player is not listed at this position
      * @throws DepthChartValidationException if required inputs are null
      */
-    public List<Player> getBackups(Position position, Player player) {
+    public synchronized List<Player> getBackups(Position position, Player player) {
         validateRequiredInputs(position, player);
 
         List<Player> playerAtPosition = chart.get(position);
@@ -122,6 +162,13 @@ public class DepthChart {
         return List.copyOf(playerAtPosition.subList(playerDepth + 1, playerAtPosition.size()));
     }
 
+    /**
+     * Validates required aggregate method inputs.
+     *
+     * @param position target position
+     * @param player   target player
+     * @throws DepthChartValidationException when either argument is null
+     */
     private void validateRequiredInputs(Position position, Player player) {
         if (position == null) {
             throw new DepthChartValidationException("position must not be null");
@@ -137,7 +184,7 @@ public class DepthChart {
      * @return unmodifiable map of positions to unmodifiable player lists; position
      *         iteration order is preserved
      */
-    public Map<Position, List<Player>> snapshot() {
+    public synchronized Map<Position, List<Player>> snapshot() {
         Map<Position, List<Player>> snapshot = new LinkedHashMap<>();
         for (Map.Entry<Position, List<Player>> entry : chart.entrySet()) {
             snapshot.put(entry.getKey(), List.copyOf(entry.getValue()));
