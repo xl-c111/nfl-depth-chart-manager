@@ -1,0 +1,5 @@
+[
+  {"number": 12, "name": "Tom Brady", "position": "QB", "depth": 0},
+  {"number": 2, "name": "Kyle Trask", "position": "QB", "depth": null},
+  {"number": 11, "name": "Blaine Gabbert", "position": "QB", "depth": 1}
+]

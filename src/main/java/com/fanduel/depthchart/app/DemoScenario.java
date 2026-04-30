@@ -18,10 +18,11 @@ import java.util.List;
  * @version 1.0
  */
 public class DemoScenario {
-    private static final String SAMPLE_DATA_PATH = "data/tb-depth-chart-sample.json";
+    private static final String DEFAULT_SAMPLE_DATA_PATH = "data/tb-depth-chart-sample.json";
 
     private final DepthChartService service;
     private final DepthChartFormatter formatter;
+    private final String sampleDataPath;
 
     /**
      * Constructs a demo scenario runner.
@@ -29,7 +30,7 @@ public class DemoScenario {
      * @param service depth chart service used by the demo flow
      */
     public DemoScenario(DepthChartService service) {
-        this(service, new DepthChartFormatter());
+        this(service, new DepthChartFormatter(), DEFAULT_SAMPLE_DATA_PATH);
     }
 
     /**
@@ -39,8 +40,20 @@ public class DemoScenario {
      * @param formatter formatter for full depth chart output
      */
     public DemoScenario(DepthChartService service, DepthChartFormatter formatter) {
+        this(service, formatter, DEFAULT_SAMPLE_DATA_PATH);
+    }
+
+    /**
+     * Constructs a demo scenario runner with explicit formatter and sample data path.
+     *
+     * @param service depth chart service used by the demo flow
+     * @param formatter formatter for full depth chart output
+     * @param sampleDataPath classpath location of sample depth chart JSON
+     */
+    public DemoScenario(DepthChartService service, DepthChartFormatter formatter, String sampleDataPath) {
         this.service = service;
         this.formatter = formatter;
+        this.sampleDataPath = sampleDataPath;
     }
 
     /**
@@ -79,9 +92,9 @@ public class DemoScenario {
      * Loads the demo depth chart rows from the bundled JSON file and seeds the service.
      */
     private void seedSampleDepthChartFromJson() {
-        try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(SAMPLE_DATA_PATH)) {
+        try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream(sampleDataPath)) {
             if (input == null) {
-                throw new IllegalStateException("sample data file not found: " + SAMPLE_DATA_PATH);
+                throw new IllegalStateException("sample data file not found: " + sampleDataPath);
             }
 
             List<DepthChartRow> rows = parseRows(input);
