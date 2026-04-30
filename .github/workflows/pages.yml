@@ -38,7 +38,14 @@ jobs:
         run: |
           mkdir -p _site
           cp -R target/site/jacoco _site/coverage
-          cp -R target/reports/apidocs _site/javadocs
+          if [ -d target/site/apidocs ]; then
+            cp -R target/site/apidocs _site/javadocs
+          elif [ -d target/reports/apidocs ]; then
+            cp -R target/reports/apidocs _site/javadocs
+          else
+            echo "Javadocs output folder not found."
+            exit 1
+          fi
           cat > _site/index.html <<'EOF'
           <!doctype html>
           <html lang="en">
