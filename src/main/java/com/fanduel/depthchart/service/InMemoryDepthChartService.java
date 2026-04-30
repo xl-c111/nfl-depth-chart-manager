@@ -3,8 +3,8 @@ package com.fanduel.depthchart.service;
 import com.fanduel.depthchart.domain.DepthChart;
 import com.fanduel.depthchart.domain.Player;
 import com.fanduel.depthchart.domain.Position;
-import com.fanduel.depthchart.formatter.DepthChartFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -15,25 +15,22 @@ import java.util.Objects;
  */
 public class InMemoryDepthChartService implements DepthChartService {
     private final DepthChart depthChart;
-    private final DepthChartFormatter formatter;
 
     /**
      * Constructs an in-memory service with default dependencies.
      */
     public InMemoryDepthChartService() {
-        this(new DepthChart(), new DepthChartFormatter());
+        this(new DepthChart());
     }
 
     /**
      * Constructs an in-memory service with injected dependencies.
      *
      * @param depthChart depth chart aggregate
-     * @param formatter output formatter
      */
-    public InMemoryDepthChartService(DepthChart depthChart, DepthChartFormatter formatter) {
+    public InMemoryDepthChartService(DepthChart depthChart) {
         // Fail fast on null dependencies
         this.depthChart = Objects.requireNonNull(depthChart, "depthChart must not be null");
-        this.formatter = Objects.requireNonNull(formatter, "formatter must not be null");
     }
 
     /**
@@ -73,12 +70,12 @@ public class InMemoryDepthChartService implements DepthChartService {
     }
 
     /**
-     * Returns the full depth chart as formatted text.
+     * Returns the full depth chart as structured snapshot.
      *
-     * @return full depth chart output
+     * @return full depth chart by position
      */
     @Override
-    public String getFullDepthChart() {
-        return formatter.format(depthChart.snapshot());
+    public Map<Position, List<Player>> getFullDepthChart() {
+        return depthChart.snapshot();
     }
 }

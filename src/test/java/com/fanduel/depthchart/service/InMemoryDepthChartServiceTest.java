@@ -2,6 +2,7 @@ package com.fanduel.depthchart.service;
 
 import com.fanduel.depthchart.domain.Player;
 import com.fanduel.depthchart.domain.DepthChart;
+import com.fanduel.depthchart.domain.Position;
 import com.fanduel.depthchart.exception.DepthChartValidationException;
 import com.fanduel.depthchart.formatter.DepthChartFormatter;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 
@@ -51,14 +53,7 @@ class InMemoryDepthChartServiceTest {
     void constructor_shouldRejectNullDepthChart() {
         assertThrows(
                 NullPointerException.class,
-                () -> new InMemoryDepthChartService(null, new DepthChartFormatter()));
-    }
-
-    @Test
-    void constructor_shouldRejectNullFormatter() {
-        assertThrows(
-                NullPointerException.class,
-                () -> new InMemoryDepthChartService(new DepthChart(), null));
+                () -> new InMemoryDepthChartService(null));
     }
 
     @Test
@@ -80,12 +75,12 @@ class InMemoryDepthChartServiceTest {
     }
 
     @Test
-    void getFullDepthChart_shouldReturnFormattedSampleDepthChart() {
+    void getFullDepthChart_shouldReturnSampleDepthChartSnapshot() {
         addSampleDepthChart();
 
-        String expected = String.join(System.lineSeparator(),
-                "QB - (#12, Tom Brady), (#11, Blaine Gabbert), (#2, Kyle Trask)",
-                "LWR - (#13, Mike Evans), (#1, Jaelon Darden), (#10, Scott Miller)");
+        Map<Position, List<Player>> expected = Map.of(
+                Position.of("QB"), List.of(TOM_BRADY, BLAINE_GABBERT, KYLE_TRASK),
+                Position.of("LWR"), List.of(MIKE_EVANS, JAELON_DARDEN, SCOTT_MILLER));
 
         assertEquals(expected, service.getFullDepthChart());
     }
@@ -98,9 +93,9 @@ class InMemoryDepthChartServiceTest {
 
         assertEquals(List.of(MIKE_EVANS), removed);
 
-        String expected = String.join(System.lineSeparator(),
-                "QB - (#12, Tom Brady), (#11, Blaine Gabbert), (#2, Kyle Trask)",
-                "LWR - (#1, Jaelon Darden), (#10, Scott Miller)");
+        Map<Position, List<Player>> expected = Map.of(
+                Position.of("QB"), List.of(TOM_BRADY, BLAINE_GABBERT, KYLE_TRASK),
+                Position.of("LWR"), List.of(JAELON_DARDEN, SCOTT_MILLER));
 
         assertEquals(expected, service.getFullDepthChart());
     }
@@ -113,9 +108,9 @@ class InMemoryDepthChartServiceTest {
 
         assertEquals(List.of(), removed);
         assertEquals(
-                "QB - (#12, Tom Brady), (#11, Blaine Gabbert), (#2, Kyle Trask)"
-                        + System.lineSeparator()
-                        + "LWR - (#13, Mike Evans), (#1, Jaelon Darden), (#10, Scott Miller)",
+                Map.of(
+                        Position.of("QB"), List.of(TOM_BRADY, BLAINE_GABBERT, KYLE_TRASK),
+                        Position.of("LWR"), List.of(MIKE_EVANS, JAELON_DARDEN, SCOTT_MILLER)),
                 service.getFullDepthChart());
     }
 
@@ -126,22 +121,22 @@ class InMemoryDepthChartServiceTest {
         List<Player> removed = service.removePlayerFromDepthChart("QB", TOM_BRADY);
 
         assertEquals(List.of(TOM_BRADY), removed);
-        assertEquals("", service.getFullDepthChart());
+        assertEquals(Map.of(), service.getFullDepthChart());
     }
 
     @Test
-    void getFullDepthChart_shouldReturnEmptyStringWhenChartIsEmpty() {
-        assertEquals("", service.getFullDepthChart());
+    void getFullDepthChart_shouldReturnEmptySnapshotWhenChartIsEmpty() {
+        assertEquals(Map.of(), service.getFullDepthChart());
     }
 
     @Test
     void getFullDepthChart_shouldBeStableAcrossRepeatedReads() {
         addSampleDepthChart();
 
-        String first = service.getFullDepthChart();
+        Map<Position, List<Player>> first = service.getFullDepthChart();
         List<Player> ignored = service.getBackups("QB", TOM_BRADY);
-        String second = service.getFullDepthChart();
-        String third = service.getFullDepthChart();
+        Map<Position, List<Player>> second = service.getFullDepthChart();
+        Map<Position, List<Player>> third = service.getFullDepthChart();
 
         assertEquals(List.of(BLAINE_GABBERT, KYLE_TRASK), ignored);
         assertEquals(first, second);
@@ -154,7 +149,7 @@ class InMemoryDepthChartServiceTest {
 
         assertEquals(List.of(), service.getBackups("QB", TOM_BRADY));
 
-        assertEquals("QB - (#12, Tom Brady)", service.getFullDepthChart());
+        assertEquals(Map.of(Position.of("QB"), List.of(TOM_BRADY)), service.getFullDepthChart());
     }
 
     @Test
@@ -212,6 +207,6 @@ class InMemoryDepthChartServiceTest {
                 "LWR - (#13, Mike Evans), (#1, Jaelon Darden), (#10, Scott Miller)",
                 "QB - (#12, Tom Brady), (#11, Blaine Gabbert), (#2, Kyle Trask)");
 
-        assertEquals(expected, service.getFullDepthChart());
+        assertEquals(expected, new DepthChartFormatter().format(service.getFullDepthChart()));
     }
 }

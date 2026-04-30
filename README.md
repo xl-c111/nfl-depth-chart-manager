@@ -1,9 +1,7 @@
-# FanDuel Depth Chart Manager
+# NFL Depth Chart Manager
 
 ## Overview
 Java 17 + Maven implementation of the FanDuel Trading Solutions coding challenge for NFL depth charts.
-
-Prompt note: the sample includes a few inconsistent position references (for example using `QB` where setup data is `LWR`, and `WR` where setup data is `LWR`). This implementation applies strict position matching and documents that behavior in tests and assumptions.
 
 ## How To Build And Run
 1. Validate with tests:
@@ -20,7 +18,7 @@ The required use cases from the challenge are implemented through `DepthChartSer
 - `addPlayerToDepthChart(String position, Player player, Integer positionDepth)`
 - `removePlayerFromDepthChart(String position, Player player)`
 - `getBackups(String position, Player player)`
-- `getFullDepthChart()`
+- `getFullDepthChart()` (returns `Map<Position, List<Player>>`; formatting is handled in app layer)
 
 Implementation classes:
 - `InMemoryDepthChartService` for use-case orchestration
@@ -28,27 +26,38 @@ Implementation classes:
 - `DepthChartFormatter` for output formatting
 
 ## Design And Organization
-- `domain`: business model and rules (`Player`, `Position`, `DepthChart`)
-- `service`: challenge API and orchestration (`DepthChartService`, `InMemoryDepthChartService`)
-- `formatter`: output formatting separated from domain logic
-- `app`: thin entrypoint (`DepthChartApplication`) and demo workflow runner (`DemoScenario`)
-- `exception`: business validation exception type
-- `test`: unit and contract-style tests
+```text
+app (DepthChartApplication, DemoScenario)
+ ├─ calls service
+ └─ uses formatter for display output
+
+service (DepthChartService, InMemoryDepthChartService)
+ └─ orchestrates depth-chart use cases
+
+domain (Player, Position, DepthChart)
+ └─ core business model and rules
+
+formatter (DepthChartFormatter)
+ └─ converts structured snapshots to text output
+
+exception (DepthChartValidationException)
+ └─ validation and contract errors across layers
+
+test
+ └─ unit and contract-style coverage across domain/service/formatter/app
+```
 
 ## Assumptions
 - Single NFL team scope in memory for this submission.
 - Player identity is jersey `number` within one team context.
 - A player can appear at multiple positions.
 - Position input is normalized with `trim + uppercase`.
-- Player constraints:
-  - `number` must be greater than `0`
-  - `name` must be non-null and non-blank
-- Depth constraints:
-  - `positionDepth == null` appends to the end
-  - non-null depth must be within `[0, currentSize]`
+- Player constraints: `number > 0`; `name` is non-null and non-blank.
+- Depth constraints: `positionDepth == null` appends; non-null depth must be within `[0, currentSize]`.
 - API return contract:
-  - `removePlayerFromDepthChart` returns a `List<Player>` for consistency: `[player]` when removed, `[]` when not found at that position
-  - In the demo output, `Removed from LWR` is the formatted display of that list result (`[player]` shown as one line, `[]` shown as `<NO LIST>`).
+  - `removePlayerFromDepthChart` returns `List<Player>`: `[player]` when removed, `[]` when absent at that position.
+  - `Optional<Player>` was intentionally not used, to keep empty-list semantics aligned with challenge output (`<NO LIST>`).
+  - In demo output, `Removed from LWR` displays that list result (`[player]` as one line, `[]` as `<NO LIST>`).
 - Removing the last player at a position removes that position from the chart snapshot/output.
 
 Full contract details:
@@ -62,14 +71,14 @@ This implementation applies strict position matching and documents the behavior 
 - Unit tests cover domain rules, service behavior, formatter output, and validation exceptions.
 - Edge cases covered include:
   - invalid depth bounds
-  - null/blank position
-  - null player
+  - null/blank position and null player
   - invalid player data (`number <= 0`, blank name)
-  - same player listed at multiple positions and independent remove behavior per position
-  - removing absent players
-  - removing the last player at a position
+  - re-adding same player at same position (reposition behavior)
+  - same player listed at multiple positions with independent remove behavior
+  - removing absent players and removing the last player at a position
   - backups for missing/non-listed players
-  - immutable snapshot behavior
+  - immutable snapshot behavior and stable formatted output ordering
+  - strict position matching for prompt inconsistencies (`QB` vs `LWR`, `WR` vs `LWR`)
 
 Coverage:
 - Run: `mvn verify`

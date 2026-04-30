@@ -1,6 +1,7 @@
 package com.fanduel.depthchart.app;
 
 import com.fanduel.depthchart.domain.Player;
+import com.fanduel.depthchart.formatter.DepthChartFormatter;
 import com.fanduel.depthchart.service.DepthChartService;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  */
 public class DemoScenario {
     private final DepthChartService service;
+    private final DepthChartFormatter formatter;
 
     /**
      * Constructs a demo scenario runner.
@@ -19,7 +21,18 @@ public class DemoScenario {
      * @param service depth chart service used by the demo flow
      */
     public DemoScenario(DepthChartService service) {
+        this(service, new DepthChartFormatter());
+    }
+
+    /**
+     * Constructs a demo scenario runner with explicit formatter.
+     *
+     * @param service depth chart service used by the demo flow
+     * @param formatter formatter for full depth chart output
+     */
+    public DemoScenario(DepthChartService service, DepthChartFormatter formatter) {
         this.service = service;
+        this.formatter = formatter;
     }
 
     /**
@@ -50,7 +63,7 @@ public class DemoScenario {
 
         System.out.println();
         System.out.println("Full depth chart:");
-        System.out.println(service.getFullDepthChart());
+        System.out.println(formatter.format(service.getFullDepthChart()));
 
         System.out.println();
         System.out.println("Removed from LWR:");
@@ -58,7 +71,7 @@ public class DemoScenario {
 
         System.out.println();
         System.out.println("Full depth chart after removal:");
-        System.out.println(service.getFullDepthChart());
+        System.out.println(formatter.format(service.getFullDepthChart()));
     }
 
     private void seedSampleDepthChart(

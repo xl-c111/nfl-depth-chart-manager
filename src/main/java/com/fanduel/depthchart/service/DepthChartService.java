@@ -1,7 +1,9 @@
 package com.fanduel.depthchart.service;
 
 import com.fanduel.depthchart.domain.Player;
+import com.fanduel.depthchart.domain.Position;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service contract for depth chart operations.
@@ -39,9 +41,9 @@ public interface DepthChartService {
     List<Player> getBackups(String position, Player player);
 
     /**
-     * Gets the full depth chart as formatted text.
+     * Gets the full depth chart as a structured immutable snapshot.
      *
-     * @return the full depth chart string
+     * @return full depth chart by position
      */
-    String getFullDepthChart();
+    Map<Position, List<Player>> getFullDepthChart();
 }
