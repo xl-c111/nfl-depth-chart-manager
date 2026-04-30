@@ -3,17 +3,19 @@
 ## Overview
 Java 17 + Maven implementation of the FanDuel Trading Solutions coding challenge for NFL depth charts.
 
+Requirements: Java 17, Maven
+
 ## How To Build And Run
 1. Validate with tests:
 ```bash
-mvn test
+mvn verify
 ```
 2. Run the demo scenario:
 ```bash
 mvn -q exec:java -Dexec.mainClass="com.fanduel.depthchart.app.DepthChartApplication"
 ```
 The demo seeds data from `src/main/resources/data/tb-depth-chart-sample.json`.
-CI runs `mvn test` automatically on every push and pull request via GitHub Actions.
+CI runs `mvn verify` automatically on every push and pull request via GitHub Actions.
 
 ## Implemented Use Cases
 The required use cases from the challenge are implemented through `DepthChartService`:
@@ -84,19 +86,20 @@ Generate Javadocs:
 - Run: `mvn javadoc:javadoc`
 - Report: `target/reports/apidocs/index.html`
 
-## Interview Artifacts
-- Assumptions/contract: `docs/requirements_and_assumptions.md`
+## Documentation & Quality
+- Assumptions/Contract: `docs/requirements_and_assumptions.md`
 - Javadocs (online): `https://xl-c111.github.io/nfl-depth-chart-manager/javadocs/index.html`
 - Coverage report (online): `https://xl-c111.github.io/nfl-depth-chart-manager/coverage/index.html`
 
-Coverage snapshot:
+Coverage snapshot (latest `main` run):
 - Instruction: `100%`
 - Branch: `100%`
 - Line: `100%`
 
-Note:
-- GitHub Pages workflow publishes Javadocs and JaCoCo report automatically from `main`.
-- If Pages is not enabled yet, use local reports under `target/` paths above.
+Notes:
+- Javadocs and JaCoCo are published automatically via GitHub Pages workflow on `main`.
+- Javadocs are generated for public API only.
+- If Pages is unavailable, generate locally with `mvn verify` and `mvn javadoc:javadoc`.
 
 ## Scalability Notes
 This submission intentionally targets one in-memory NFL team. To address the scaling questions in the prompt, evolve it in three steps:
