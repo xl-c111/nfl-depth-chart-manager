@@ -80,6 +80,24 @@ Coverage:
 - Run: `mvn verify`
 - Report: `target/site/jacoco/index.html`
 
+Generate Javadocs:
+- Run: `mvn javadoc:javadoc`
+- Report: `target/reports/apidocs/index.html`
+
+## Interview Artifacts
+- Assumptions/contract: `docs/requirements_and_assumptions.md`
+- Javadocs (online): `https://xl-c111.github.io/nfl-depth-chart-manager/javadocs/index.html`
+- Coverage report (online): `https://xl-c111.github.io/nfl-depth-chart-manager/coverage/index.html`
+
+Coverage snapshot:
+- Instruction: `100%`
+- Branch: `100%`
+- Line: `100%`
+
+Note:
+- GitHub Pages workflow publishes Javadocs and JaCoCo report automatically from `main`.
+- If Pages is not enabled yet, use local reports under `target/` paths above.
+
 ## Scalability Notes
 This submission intentionally targets one in-memory NFL team. To address the scaling questions in the prompt, evolve it in three steps:
 

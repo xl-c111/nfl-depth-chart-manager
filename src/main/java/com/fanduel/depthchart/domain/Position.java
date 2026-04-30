@@ -24,6 +24,7 @@ public final class Position {
 
     /**
      * Creates a position from raw input.
+     * Input is normalized via {@code trim()} and uppercase with {@link Locale#ROOT}.
      *
      * @param rawCode the raw position code
      * @return the created Position

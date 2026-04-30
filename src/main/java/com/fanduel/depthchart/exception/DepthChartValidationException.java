@@ -1,7 +1,7 @@
 package com.fanduel.depthchart.exception;
 
 /**
- * Exception for depth chart validation errors.
+ * Unchecked exception for depth chart contract and validation violations.
  *
  * @author Xiaoling Cui
  * @version 1.0

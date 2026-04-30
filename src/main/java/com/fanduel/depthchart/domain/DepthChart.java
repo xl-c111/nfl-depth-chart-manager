@@ -19,6 +19,8 @@ public class DepthChart {
 
     /**
      * Adds a player at a given position and depth.
+     * Inserting at a depth shifts existing players at and below that depth down.
+     * Re-adding an existing player at the same position repositions the player.
      *
      * @param position target position
      * @param player   player to add
@@ -68,7 +70,8 @@ public class DepthChart {
      *
      * @param position target position
      * @param player   player to remove
-     * @return a single-element list when removed, or empty list when absent
+     * @return a single-element list when removed, or empty list when absent at
+     *         this position
      * @throws DepthChartValidationException if required inputs are null
      */
     public List<Player> removePlayer(Position position, Player player) {
@@ -98,7 +101,8 @@ public class DepthChart {
      *
      * @param position target position
      * @param player   reference player
-     * @return players with lower priority depth, or empty list when none
+     * @return players with lower priority depth, or empty list when none or when
+     *         the player is not listed at this position
      * @throws DepthChartValidationException if required inputs are null
      */
     public List<Player> getBackups(Position position, Player player) {
@@ -130,7 +134,8 @@ public class DepthChart {
     /**
      * Returns an immutable snapshot of the full depth chart.
      *
-     * @return unmodifiable map of positions to unmodifiable player lists
+     * @return unmodifiable map of positions to unmodifiable player lists; position
+     *         iteration order is preserved
      */
     public Map<Position, List<Player>> snapshot() {
         Map<Position, List<Player>> snapshot = new LinkedHashMap<>();

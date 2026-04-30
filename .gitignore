@@ -19,6 +19,10 @@
 # Logs
 *.log
 
+# Generated docs
+docs/javadocs/
+docs/coverage/
+
 # OS temp files
 *.swp
 *~
