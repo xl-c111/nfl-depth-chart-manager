@@ -6,7 +6,7 @@ Java 17 + Maven implementation of the FanDuel Trading Solutions coding challenge
 Requirements: Java 17, Maven
 
 ## How To Build And Run
-1. Validate with tests:
+1. Run tests and coverage:
 ```bash
 mvn verify
 ```
@@ -14,81 +14,54 @@ mvn verify
 ```bash
 mvn -q exec:java -Dexec.mainClass="com.fanduel.depthchart.app.DepthChartApplication"
 ```
-The demo seeds data from `src/main/resources/data/tb-depth-chart-sample.json`.
-CI runs `mvn verify` automatically on every push and pull request via GitHub Actions.
+The demo seeds from `src/main/resources/data/tb-depth-chart-sample.json`.
 
 ## Implemented Use Cases
-The required use cases from the challenge are implemented through `DepthChartService`:
+Implemented through `DepthChartService`:
 - `addPlayerToDepthChart(String position, Player player, Integer positionDepth)`
 - `removePlayerFromDepthChart(String position, Player player)`
 - `getBackups(String position, Player player)`
 - `getFullDepthChart()`
 
-Implementation classes:
-- `InMemoryDepthChartService` for use-case orchestration
-- `DepthChart` for core depth chart rules
-- `DepthChartFormatter` for output formatting
-
-## Design And Organization
+## Design
 ```text
 app (DepthChartApplication, DemoScenario)
- ├─ calls service
- └─ uses formatter for display output
+ └─ demo flow and console output
 
 service (DepthChartService, InMemoryDepthChartService)
- └─ orchestrates depth-chart use cases
+ └─ use-case orchestration
 
 domain (Player, Position, DepthChart)
- └─ core business model and rules
+ └─ core rules and invariants
 
 formatter (DepthChartFormatter)
- └─ converts structured snapshots to text output
-
-exception (DepthChartValidationException)
- └─ validation and contract errors across layers
-
-test
- └─ unit and contract-style coverage across domain/service/formatter/app
+ └─ formatting of full chart output
 ```
 
 ## Assumptions
 - Single NFL team scope in memory for this submission.
-- Player identity is jersey `number` within one team context.
+- Player identity is jersey `number` within one team context (`[0, 99]`).
 - A player can appear at multiple positions.
 - Position input is normalized with `trim + uppercase`.
-- Player constraints: `number > 0`; `name` is non-null and non-blank.
+- Position codes are validated against an explicit NFL allowlist (for example `QB`, `RB`, `WR`, `LWR`, `SWR`, `RWR`, `TE`, `LT`, `LG`, `C`, `RG`, `RT`, `CB`, `FS`, `SS`, `K`, `P`, `LS`, `KR`, `PR`); unsupported codes throw `DepthChartValidationException`.
+- Strict position matching is used (`WR` and `LWR` are different position keys).
+- Same number with materially different name is rejected; name consistency check is case-insensitive only (`Tom Brady` equals `TOm BrADY`, but `Brady` does not equal `Brandy`).
+- Player name is non-null, non-blank, and trimmed.
 - Depth constraints: `positionDepth == null` appends; non-null depth must be within `[0, currentSize]`.
 - Re-adding the same player at the same position is treated as repositioning (not duplication). For repositioning, `positionDepth == currentSize` is valid and means moving that player to the end.
-- API return contract: `removePlayerFromDepthChart` returns `List<Player>` (`[player]` when removed, `[]` when absent). `Optional<Player>` is intentionally not used to preserve challenge-style empty-list semantics (`<NO LIST>` in demo output).
+- `removePlayerFromDepthChart` returns `List<Player>` (`[player]` when removed, `[]` when absent) to align with challenge empty-list semantics.
 - Removing the last player at a position removes that position from the chart snapshot/output.
-
-Full contract details:
-- `docs/requirements_and_assumptions.md`
+- Concurrency model: `DepthChart` uses in-process `synchronized` method-level locking to prevent race conditions on concurrent access.
+- Thread-safety scope: this protects concurrent access within one JVM process only; distributed concurrency control is out of scope for this submission.
 
 ## Sample Inconsistencies In Prompt
-The challenge sample includes a few inconsistent position references (for example using `QB` where setup data is `LWR`, and `WR` where setup data is `LWR`).  
-This implementation applies strict position matching and documents the behavior in tests and assumptions.
+The prompt includes inconsistent position references (for example `QB` used where setup data is `LWR`, and `WR` used where setup data is `LWR`).
+This implementation keeps strict matching and treats these as prompt typos.
 
-## Testing Approach
-- Unit tests cover domain rules, service behavior, formatter output, and validation exceptions.
-- Edge cases covered include:
-  - input validation (depth bounds, null/blank position, null player, invalid player data)
-  - ordering semantics (insert shift-down, reposition including move-to-end, stable output ordering)
-  - position-scoped behavior (same player across multiple positions, strict position matching)
-  - removal semantics (absent player returns empty list, last removal drops the position key)
-  - query semantics (`getBackups` for missing/non-listed/terminal players, immutable snapshots)
-
-Coverage:
-- Run: `mvn verify`
-- Report: `target/site/jacoco/index.html`
-
-Generate Javadocs:
-- Run: `mvn javadoc:javadoc`
-- Report: `target/reports/apidocs/index.html`
-
-## Documentation & Quality
-- Assumptions/Contract: `docs/requirements_and_assumptions.md`
-- Javadocs (online): `https://xl-c111.github.io/nfl-depth-chart-manager/javadocs/index.html`
+## Testing
+- Unit tests cover domain rules, service behavior, formatter output, demo flow, and validation errors.
+- Edge cases include invalid inputs, depth bounds, strict position matching, reposition semantics, absent removals, terminal backups, and immutable snapshots.
+- Coverage report (local): `target/site/jacoco/index.html`
 - Coverage report (online): `https://xl-c111.github.io/nfl-depth-chart-manager/coverage/index.html`
 
 Coverage snapshot (latest `main` run):
@@ -96,10 +69,9 @@ Coverage snapshot (latest `main` run):
 - Branch: `100%`
 - Line: `100%`
 
-Notes:
-- Javadocs and JaCoCo are published automatically via GitHub Pages workflow on `main`.
-- Javadocs are generated for public API only.
-- If Pages is unavailable, generate locally with `mvn verify` and `mvn javadoc:javadoc`.
+## Documentation
+- Full contract details: `docs/requirements_and_assumptions.md`
+- Javadocs (online): `https://xl-c111.github.io/nfl-depth-chart-manager/javadocs/index.html`
 
 ## Scalability Notes
 This submission intentionally targets one in-memory NFL team. To address the scaling questions in the prompt, evolve it in three steps:

@@ -39,9 +39,13 @@ This document captures the functional contract and implementation decisions for 
 
 ## Data and Validation Assumptions
 1. `Player.number` is unique within one team context.
-2. A player may exist at multiple positions simultaneously.
-3. Position input is normalized as `trim + uppercase`.
-4. Required inputs (`position`, `player`) must be non-null.
+2. `Player.number` must be in `[0, 99]`.
+3. The same `number` cannot be associated with different `name` values within a team context.
+4. Name consistency for the same `number` is case-insensitive only (`Tom Brady` equals `TOm BrADY`), and does not include typo/spelling correction (`Brady` does not equal `Brandy`).
+5. A player may exist at multiple positions simultaneously.
+6. Position input is normalized as `trim + uppercase`.
+7. Position codes must be valid NFL codes from the implementation allowlist; unsupported codes are rejected.
+8. Required inputs (`position`, `player`) must be non-null.
 
 ## Challenge Sample Inconsistencies and Resolution
 1. Sample call `getBackups("QB", JaelonDarden)` conflicts with setup (`JaelonDarden` added at `LWR`).
@@ -60,4 +64,7 @@ Resolution: treated as documentation typo; typed model fields are authoritative.
 4. Multi-team abstraction beyond current single-team scope.
 
 ## Concurrency
-Current target is non-thread-safe in-memory behavior, which is acceptable for challenge scope. If concurrency is required, introduce synchronization or an immutable snapshot/update strategy.
+This implementation is thread-safe for in-process access to one `DepthChart` instance using `synchronized` method-level locking.
+- `addPlayer`, `removePlayer`, `getBackups`, and `snapshot` are synchronized.
+
+Scope note: this covers concurrency within a single JVM process only. Distributed consistency and cross-process coordination are out of scope for this challenge submission.
