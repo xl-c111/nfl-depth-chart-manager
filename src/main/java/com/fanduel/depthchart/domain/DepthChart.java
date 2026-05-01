@@ -12,6 +12,11 @@ import com.fanduel.depthchart.exception.DepthChartValidationException;
 /**
  * Aggregate root for depth chart rules and position-based player ordering.
  *
+ * <p>
+ * This in-memory aggregate uses coarse synchronized method-level locking for
+ * single-JVM consistency.
+ * </p>
+ *
  * @author Xiaoling Cui
  * @version 3.0
  */
@@ -19,13 +24,16 @@ public class DepthChart {
     private final Map<Position, List<Player>> chart = new LinkedHashMap<>();
 
     /**
-     * Adds a player at a given position and depth.
+     * Adds or repositions a player at a given position and depth.
+     *
+     * <p>
      * Inserting at a depth shifts existing players at and below that depth down.
      * Re-adding an existing player at the same position repositions the player.
+     * </p>
      *
      * @param position target position
-     * @param player   player to add
-     * @param depth    target depth (null means append)
+     * @param player   player to add or reposition
+     * @param depth    target depth; {@code null} means append
      * @throws DepthChartValidationException if inputs are invalid or depth is out
      *                                       of range
      */
@@ -69,14 +77,11 @@ public class DepthChart {
     }
 
     /**
-     * Enforces single-team identity consistency:
-     * jersey number is the unique identity, and name must remain consistent for
-     * that number.
+     * Ensures the same jersey number is not used with different player names.
      *
      * @param candidate player being inserted or repositioned
-     * @throws DepthChartValidationException when the same number already exists
-     *                                       with a
-     *                                       materially different name
+     * @throws DepthChartValidationException if the number already exists with a
+     *                                       different name
      */
     private void validatePlayerIdentityConsistency(Player candidate) {
         for (List<Player> players : chart.values()) {
@@ -91,13 +96,6 @@ public class DepthChart {
         }
     }
 
-    /**
-     * Compares two player names using case-insensitive equality.
-     *
-     * @param left  first name
-     * @param right second name
-     * @return true when names are equal ignoring character case
-     */
     private boolean namesEquivalent(String left, String right) {
         return left.toLowerCase(Locale.ROOT).equals(right.toLowerCase(Locale.ROOT));
     }

@@ -5,6 +5,11 @@ import com.fanduel.depthchart.exception.DepthChartValidationException;
 /**
  * Value object for an NFL player.
  *
+ * <p>
+ * For this challenge, jersey number is treated as the player's identity
+ * within a single team context.
+ * </p>
+ *
  * @author Xiaoling Cui
  * @version 3.0
  */
@@ -19,8 +24,7 @@ public final class Player {
      * @param number the player number
      * @param name   the player name
      * @throws DepthChartValidationException if number is outside {@code [0, 99]}
-     *                                       or name is
-     *                                       null/blank
+     *                                       or name is null/blank
      */
     public Player(int number, String name) {
         if (number < 0) {

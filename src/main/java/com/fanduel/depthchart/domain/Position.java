@@ -6,7 +6,12 @@ import java.util.Set;
 import com.fanduel.depthchart.exception.DepthChartValidationException;
 
 /**
- * Value object for NFL depth chart position code.
+ * Validated NFL position value object.
+ *
+ * <p>
+ * The allowlist is intentionally NFL-specific for this challenge and can
+ * be moved behind sport-specific rules if supporting multiple sports.
+ * </p>
  *
  * @author Xiaoling Cui
  * @version 3.0

@@ -45,6 +45,7 @@ This document captures the functional contract and implementation decisions for 
 5. A player may exist at multiple positions simultaneously.
 6. Position input is normalized as `trim + uppercase`.
 7. Position codes must be valid NFL codes from the implementation allowlist; unsupported codes are rejected.
+   The current NFL allowlist is intentionally strict for this challenge; in a multi-sport version, position validation should move behind a sport-specific rules provider rather than remain hard-coded in `Position`.
 8. Required inputs (`position`, `player`) must be non-null.
 
 ## Challenge Sample Inconsistencies and Resolution
@@ -58,10 +59,9 @@ Resolution: treated as sample typo; implementation uses strict normalized positi
 Resolution: treated as documentation typo; typed model fields are authoritative.
 
 ## Non-Goals
-1. Persistence/database integration.
-2. REST/GraphQL API layer.
-3. PDF/webpage ingestion/parsing from external sources (demo uses bundled local JSON only).
-4. Multi-team abstraction beyond current single-team scope.
+1. Production infrastructure concerns (persistence, distributed consistency, and multi-team orchestration).
+2. External delivery interfaces (REST/GraphQL API layer).
+3. External document ingestion/parsing beyond bundled local demo data.
 
 ## Concurrency
 This implementation is thread-safe for in-process access to one `DepthChart` instance using `synchronized` method-level locking.

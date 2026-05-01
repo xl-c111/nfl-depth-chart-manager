@@ -43,39 +43,39 @@ formatter (DepthChartFormatter)
 - Player identity is jersey `number` within one team context (`[0, 99]`).
 - A player can appear at multiple positions.
 - Position input is normalized with `trim + uppercase`.
-- Position codes are validated against an explicit NFL allowlist (for example `QB`, `RB`, `WR`, `LWR`, `SWR`, `RWR`, `TE`, `LT`, `LG`, `C`, `RG`, `RT`, `CB`, `FS`, `SS`, `K`, `P`, `LS`, `KR`, `PR`); unsupported codes throw `DepthChartValidationException`.
+- Position codes are validated against an explicit NFL allowlist; unsupported codes throw `DepthChartValidationException`.
+- The NFL allowlist is intentionally strict for this challenge; in a multi-sport version, this would move behind a sport-specific rules provider.
 - Strict position matching is used (`WR` and `LWR` are different position keys).
-- Same number with materially different name is rejected; name consistency check is case-insensitive only (`Tom Brady` equals `TOm BrADY`, but `Brady` does not equal `Brandy`).
-- Player name is non-null, non-blank, and trimmed.
-- Depth constraints: `positionDepth == null` appends; non-null depth must be within `[0, currentSize]`.
-- Re-adding the same player at the same position is treated as repositioning (not duplication). For repositioning, `positionDepth == currentSize` is valid and means moving that player to the end.
+- `positionDepth == null` appends; non-null depth must be within `[0, currentSize]`.
+- Re-adding the same player at the same position is treated as repositioning, not duplication.
 - `removePlayerFromDepthChart` returns `List<Player>` (`[player]` when removed, `[]` when absent) to align with challenge empty-list semantics.
-- Removing the last player at a position removes that position from the chart snapshot/output.
-- Concurrency model: `DepthChart` uses in-process `synchronized` method-level locking to prevent race conditions on concurrent access.
-- Thread-safety scope: this protects concurrent access within one JVM process only; distributed concurrency control is out of scope for this submission.
+- Concurrency is limited to single-JVM in-process safety using coarse `synchronized` locking.
 
 ## Sample Inconsistencies In Prompt
 The prompt includes inconsistent position references (for example `QB` used where setup data is `LWR`, and `WR` used where setup data is `LWR`).
 This implementation keeps strict matching and treats these as prompt typos.
 
 ## Testing
-- Unit tests cover domain rules, service behavior, formatter output, demo flow, and validation errors.
-- Edge cases include invalid inputs, depth bounds, strict position matching, reposition semantics, absent removals, terminal backups, and immutable snapshots.
+- The test suite focuses on highest-risk behavior: ordering, identity consistency, boundary validation, strict position matching, and immutable snapshots.
+- Tests also cover service behavior, formatter output, demo flow, and validation errors.
 - Coverage report (local): `target/site/jacoco/index.html`
 - Coverage report (online): `https://xl-c111.github.io/nfl-depth-chart-manager/coverage/index.html`
-
-Coverage snapshot (latest `main` run):
-- Instruction: `100%`
-- Branch: `100%`
-- Line: `100%`
 
 ## Documentation
 - Full contract details: `docs/requirements_and_assumptions.md`
 - Javadocs (online): `https://xl-c111.github.io/nfl-depth-chart-manager/javadocs/index.html`
 
-## Scalability Notes
-This submission intentionally targets one in-memory NFL team. To address the scaling questions in the prompt, evolve it in three steps:
+## Design Tradeoffs
+- Strict position matching over fuzzy matching: avoids silent data corruption from ambiguous keys.
+- Structured service output over preformatted strings: keeps domain and service logic reusable across interfaces.
+- In-memory implementation over persistence: appropriate for challenge scope and deterministic tests.
+- Coarse `synchronized` locking over fine-grained locking: simpler and safer for this scope, at the cost of throughput under contention.
 
-- Multi-team NFL support: introduce a `TeamId` and replace the single in-memory `DepthChart` instance with a repository keyed by team, so one service can manage all 32 teams with the same use-case API; at that point, player identity should evolve from jersey number to `(teamId, number)` or a global `playerId`.
-- Multi-sport support: keep `DepthChart` as the core ordering model, and move sport-specific constraints behind a `DepthChartRules` contract (for example NFL vs NBA position vocabularies and roster semantics).
-- Production persistence and throughput: keep the current in-memory adapter for tests/demo, add a database-backed repository for durable state, and add optimistic locking/version checks so concurrent updates do not corrupt ordering.
+## Scalability Notes
+This submission intentionally focuses on one in-memory NFL team. To scale the design:
+
+- **Multiple NFL teams**: introduce a `TeamId` and a repository keyed by team, so the same service API can manage all 32 teams. Player identity can then evolve from jersey `number` to `(teamId, number)` or a global `playerId`.
+
+- **Multiple sports**: keep `DepthChart` as the reusable ordering model, and move sport-specific validation behind a `DepthChartRules` abstraction.
+
+- **Production persistence**: keep the in-memory implementation for tests and demos, and add a database-backed repository for durable state, concurrency control, and higher-throughput reads/writes.
