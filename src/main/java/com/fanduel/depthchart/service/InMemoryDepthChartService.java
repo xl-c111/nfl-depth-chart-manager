@@ -28,6 +28,10 @@ public class InMemoryDepthChartService implements DepthChartService {
      *
      * @param depthChart depth chart aggregate
      */
+    // Dependency injection: class receives its dependencies from outside, without
+    // creating them internally
+    // InMemoryDepthChartService depends on DepthChart, instead of creating a new
+    // DepthChart itself, the DepthChart is passed into the constructor.
     public InMemoryDepthChartService(DepthChart depthChart) {
         // Fail fast on null dependencies
         this.depthChart = Objects.requireNonNull(depthChart, "depthChart must not be null");
@@ -36,8 +40,8 @@ public class InMemoryDepthChartService implements DepthChartService {
     /**
      * Adds a player to a position at a target depth.
      *
-     * @param position position code
-     * @param player player to add
+     * @param position      position code
+     * @param player        player to add
      * @param positionDepth target depth (null means append)
      */
     @Override
@@ -49,8 +53,9 @@ public class InMemoryDepthChartService implements DepthChartService {
      * Removes a player from a position.
      *
      * @param position position code
-     * @param player player to remove
-     * @return a single-element list {@code [player]} when removed, or an empty list {@code []} when not listed at that position
+     * @param player   player to remove
+     * @return a single-element list {@code [player]} when removed, or an empty list
+     *         {@code []} when not listed at that position
      */
     @Override
     public List<Player> removePlayerFromDepthChart(String position, Player player) {
@@ -61,7 +66,7 @@ public class InMemoryDepthChartService implements DepthChartService {
      * Returns backups behind a player at a position.
      *
      * @param position position code
-     * @param player reference player
+     * @param player   reference player
      * @return backups behind the given player
      */
     @Override

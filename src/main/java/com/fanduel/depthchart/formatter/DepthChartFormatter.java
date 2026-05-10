@@ -21,7 +21,9 @@ public class DepthChartFormatter {
      * @return the formatted depth chart string
      */
     public String format(Map<Position, List<Player>> snapshot) {
+
         StringJoiner lines = new StringJoiner(System.lineSeparator());
+        
         for (Map.Entry<Position, List<Player>> entry : snapshot.entrySet()) {
             StringJoiner players = new StringJoiner(", ");
             for (Player player : entry.getValue()) {

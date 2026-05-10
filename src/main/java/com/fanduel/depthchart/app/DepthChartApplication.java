@@ -23,7 +23,8 @@ public final class DepthChartApplication {
      * @param args command-line arguments
      */
     public static void main(String[] args) {
+        // DIP: caller depends on interface, not concrete implementations
         DepthChartService service = new InMemoryDepthChartService();
-        new DemoScenario(service).run();
+        new DemoScenario(service).runDemoScenario();
     }
 }

@@ -32,6 +32,10 @@ public final class Position {
      *
      * @param code the normalized position code
      */
+    // Why constructor is private: it blocks direct object creation. It force
+    // everyone to use Position.of(), so validation and normalization always happen
+    // public static factory method of() becomes the only allowed way to create
+    // Position.
     private Position(String code) {
         this.code = code;
     }
@@ -47,13 +51,19 @@ public final class Position {
      * @throws DepthChartValidationException if rawCode is null, blank, or not an
      *                                       allowed NFL position code
      */
+
+    // static factory method: Position.of() creates Position object. It validates
+    // and normalizes the input before calling the private constructor.
     public static Position of(String rawCode) {
+        // check whether value is completely missing
         if (rawCode == null) {
             throw new DepthChartValidationException("position must not be null");
         }
 
+        // use Locale.ROOT to avoid language-specific casing bugs
         String normalized = rawCode.trim().toUpperCase(Locale.ROOT);
 
+        // check whether the remaining text has zero length
         if (normalized.isEmpty()) {
             throw new DepthChartValidationException("position must not be blank");
         }

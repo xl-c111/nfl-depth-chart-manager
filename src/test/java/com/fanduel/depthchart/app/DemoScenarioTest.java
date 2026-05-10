@@ -22,7 +22,7 @@ class DemoScenarioTest {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try {
             System.setOut(new PrintStream(buffer, true, StandardCharsets.UTF_8));
-            scenario.run();
+            scenario.runDemoScenario();
         } finally {
             System.setOut(originalOut);
         }
@@ -38,7 +38,7 @@ class DemoScenarioTest {
                 new com.fanduel.depthchart.formatter.DepthChartFormatter(),
                 "data/does-not-exist.json");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::runDemoScenario);
         assertTrue(exception.getMessage().contains("sample data file not found"));
     }
 
@@ -49,7 +49,7 @@ class DemoScenarioTest {
                 new com.fanduel.depthchart.formatter.DepthChartFormatter(),
                 "data/invalid-root-not-array.json");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::runDemoScenario);
         assertTrue(exception.getMessage().contains("sample data must be a JSON array"));
     }
 
@@ -60,7 +60,7 @@ class DemoScenarioTest {
                 new com.fanduel.depthchart.formatter.DepthChartFormatter(),
                 "data/invalid-row-not-object.json");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::runDemoScenario);
         assertTrue(exception.getMessage().contains("sample row must be a JSON object"));
     }
 
@@ -71,7 +71,7 @@ class DemoScenarioTest {
                 new com.fanduel.depthchart.formatter.DepthChartFormatter(),
                 "data/missing-required-field.json");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::runDemoScenario);
         assertTrue(exception.getMessage().contains("sample row missing required fields"));
     }
 
@@ -82,7 +82,7 @@ class DemoScenarioTest {
                 new com.fanduel.depthchart.formatter.DepthChartFormatter(),
                 "data/missing-required-name.json");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::runDemoScenario);
         assertTrue(exception.getMessage().contains("sample row missing required fields"));
     }
 
@@ -93,7 +93,7 @@ class DemoScenarioTest {
                 new com.fanduel.depthchart.formatter.DepthChartFormatter(),
                 "data/missing-required-number.json");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::runDemoScenario);
         assertTrue(exception.getMessage().contains("sample row missing required fields"));
     }
 
@@ -104,7 +104,7 @@ class DemoScenarioTest {
                 new com.fanduel.depthchart.formatter.DepthChartFormatter(),
                 "data/missing-required-position.json");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::runDemoScenario);
         assertTrue(exception.getMessage().contains("sample row missing required fields"));
     }
 
@@ -115,7 +115,7 @@ class DemoScenarioTest {
                 new com.fanduel.depthchart.formatter.DepthChartFormatter(),
                 "data/invalid-number-type.json");
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::run);
+        IllegalStateException exception = assertThrows(IllegalStateException.class, scenario::runDemoScenario);
         assertTrue(exception.getMessage().contains("failed to load sample depth chart data"));
     }
 
@@ -130,7 +130,7 @@ class DemoScenarioTest {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try {
             System.setOut(new PrintStream(buffer, true, StandardCharsets.UTF_8));
-            scenario.run();
+            scenario.runDemoScenario();
         } finally {
             System.setOut(originalOut);
         }
@@ -150,7 +150,7 @@ class DemoScenarioTest {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try {
             System.setOut(new PrintStream(buffer, true, StandardCharsets.UTF_8));
-            scenario.run();
+            scenario.runDemoScenario();
         } finally {
             System.setOut(originalOut);
         }
@@ -168,7 +168,7 @@ class DemoScenarioTest {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try {
             System.setOut(new PrintStream(buffer, true, StandardCharsets.UTF_8));
-            scenario.run();
+            scenario.runDemoScenario();
         } finally {
             System.setOut(originalOut);
         }

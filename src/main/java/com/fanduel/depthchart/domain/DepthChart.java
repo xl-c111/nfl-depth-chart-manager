@@ -20,7 +20,11 @@ import com.fanduel.depthchart.exception.DepthChartValidationException;
  * @author Xiaoling Cui
  * @version 3.0
  */
+
+// DepthChart is aggregate root: it's main entry point for a grouped related
+// domain objects.
 public class DepthChart {
+    // chart is the internal state of the depth chart
     private final Map<Position, List<Player>> chart = new LinkedHashMap<>();
 
     /**
@@ -49,8 +53,8 @@ public class DepthChart {
 
         // Validate requested depth against the pre-change list size.
         int originalSize = playerAtPosition.size();
-        // Re-adding the same player at this position means repositioning, not
-        // duplicating.
+        // it only checks whether the player is already listed in the same position, so
+        // it prevents duplicates within that position
         boolean alreadyExists = playerAtPosition.contains(player);
 
         if (depth == null) {
@@ -84,8 +88,11 @@ public class DepthChart {
      *                                       different name
      */
     private void validatePlayerIdentityConsistency(Player candidate) {
+        // check every player list across all positions in the depth chart
         for (List<Player> players : chart.values()) {
+            // check each existing player one by one
             for (Player existing : players) {
+                // if the same number has been used by a different name, throw error
                 if (existing.getNumber() == candidate.getNumber()
                         && !namesEquivalent(existing.getName(), candidate.getName())) {
                     throw new DepthChartValidationException(
@@ -96,8 +103,10 @@ public class DepthChart {
         }
     }
 
+    // handles formatting noise in user input
     private boolean namesEquivalent(String left, String right) {
-        return left.toLowerCase(Locale.ROOT).equals(right.toLowerCase(Locale.ROOT));
+        return left.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT)
+                .equals(right.trim().replaceAll("\\s+", " ").toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -118,6 +127,7 @@ public class DepthChart {
         }
 
         int removedIndex = playerAtPosition.indexOf(player);
+        // if this player doesn't exist, return empty list
         if (removedIndex < 0) {
             return List.of();
         }
@@ -126,7 +136,7 @@ public class DepthChart {
         // not the player object passed in by the caller.
         Player removedPlayer = playerAtPosition.remove(removedIndex);
 
-        // Keep snapshots compact by removing empty positions entirely.
+        // if no player left at this position, remove the position entry from the chart
         if (playerAtPosition.isEmpty()) {
             chart.remove(position);
         }
@@ -187,6 +197,7 @@ public class DepthChart {
         for (Map.Entry<Position, List<Player>> entry : chart.entrySet()) {
             snapshot.put(entry.getKey(), List.copyOf(entry.getValue()));
         }
+        // copy the structure, copy read-only player lists, return a read-only map
         return Collections.unmodifiableMap(snapshot);
     }
 }
