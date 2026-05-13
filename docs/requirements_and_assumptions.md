@@ -35,7 +35,7 @@ This document captures the functional contract and implementation decisions for 
 
 ### `getFullDepthChart()`
 - Returns full depth chart for all positions currently present.
-- Domain returns structured snapshot; formatting is handled separately in IO layer.
+- Domain returns structured snapshot; formatting is handled separately in formatter layer.
 
 ## Data and Validation Assumptions
 1. `Player.number` is unique within one team context.

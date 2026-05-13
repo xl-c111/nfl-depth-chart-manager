@@ -24,19 +24,9 @@ Implemented through `DepthChartService`:
 - `getFullDepthChart()`
 
 ## Design
-```text
-app (DepthChartApplication, DemoScenario)
- └─ demo flow and console output
+![UML Architecture](docs/depth_chart_architecture_uml.png)
 
-service (DepthChartService, InMemoryDepthChartService)
- └─ use-case orchestration
-
-domain (Player, Position, DepthChart)
- └─ core rules and invariants
-
-formatter (DepthChartFormatter)
- └─ formatting of full chart output
-```
+Detailed UML and sequence diagrams: `docs/architecture.md`.
 
 ## Assumptions
 - Single NFL team scope in memory for this submission.
